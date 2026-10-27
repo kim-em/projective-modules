@@ -216,7 +216,7 @@ with direct-sum addition and the regular right-module class as unit, as in Weibe
 *The K-book*, Chapter II, §2. The zero ring is allowed. Natural-number casts use the
 stored scaling of the direct-sum additive monoid. -/
 noncomputable instance instCommSemiring : CommSemiring (ProjectiveClass R) where
-  __ := KTheory.instAddCommMonoidProjectiveClass R
+  __ := TauCeti.instAddCommMonoidObjectCode (C := ModuleCat.FiniteProjective.{u, u} Rᵐᵒᵖ)
   mul := tensorMul R
   one := of R Rᵐᵒᵖ
   mul_assoc := tensorMul_assoc R
@@ -227,9 +227,12 @@ noncomputable instance instCommSemiring : CommSemiring (ProjectiveClass R) where
   right_distrib := add_tensorMul R
   zero_mul := zero_tensorMul R
   mul_zero := tensorMul_zero R
-  natCast n := (KTheory.instAddCommMonoidProjectiveClass R).nsmul n (of R Rᵐᵒᵖ)
-  natCast_zero := (KTheory.instAddCommMonoidProjectiveClass R).nsmul_zero (of R Rᵐᵒᵖ)
-  natCast_succ n := (KTheory.instAddCommMonoidProjectiveClass R).nsmul_succ n (of R Rᵐᵒᵖ)
+  natCast n := (TauCeti.instAddCommMonoidObjectCode
+    (C := ModuleCat.FiniteProjective.{u, u} Rᵐᵒᵖ)).nsmul n (of R Rᵐᵒᵖ)
+  natCast_zero := (TauCeti.instAddCommMonoidObjectCode
+    (C := ModuleCat.FiniteProjective.{u, u} Rᵐᵒᵖ)).nsmul_zero (of R Rᵐᵒᵖ)
+  natCast_succ n := (TauCeti.instAddCommMonoidObjectCode
+    (C := ModuleCat.FiniteProjective.{u, u} Rᵐᵒᵖ)).nsmul_succ n (of R Rᵐᵒᵖ)
 
 private theorem instCommSemiring_toAddCommMonoid :
     (instCommSemiring R).toAddCommMonoid = directSumAddCommMonoid R := rfl

@@ -43,6 +43,8 @@ composition use Mathlib's interfaces.
 
 @[expose] public section
 
+open TauCeti
+
 universe uR uS uT uU uM
 
 namespace ModuleCat.RightExtension
@@ -63,8 +65,8 @@ theorem compLinearEquiv_id_left :
   let : Module R S := φ.toModule
   let tensor : Obj (RingHom.id R) M →+ Obj φ (Obj (RingHom.id R) M) :=
     { toFun := fun x => tmul φ x s
-      map_zero' := BalancedTensorProduct.zero_tmul s
-      map_add' := fun x y => BalancedTensorProduct.add_tmul x y s }
+      map_zero' := BalancedTensorProduct.zero_tmul ℤ _ s
+      map_add' := fun x y => BalancedTensorProduct.add_tmul ℤ _ x y s }
   -- At a fixed outer coefficient the inner maps are only additive.
   let lhs : Obj (RingHom.id R) M →+ Obj φ M :=
     (compLinearEquiv (RingHom.id R) φ M).toLinearMap.toAddMonoidHom.comp tensor
@@ -72,7 +74,7 @@ theorem compLinearEquiv_id_left :
     (map φ (idLinearEquiv R M).toLinearMap).toAddMonoidHom.comp tensor
   let : Module R R := (RingHom.id R).toModule
   have h : lhs = rhs := by
-    apply BalancedTensorProduct.hom_ext (R := R) (M := M) (N := R)
+    apply BalancedTensorProduct.addHom_ext (R := R) (M := M) (N := R)
     intro m r
     change compLinearEquiv (RingHom.id R) φ M
         (tmul φ (tmul (RingHom.id R) m r) s) =
@@ -95,8 +97,8 @@ theorem compLinearEquiv_id_right :
   let : Module S S := (RingHom.id S).toModule
   let tensor : Obj φ M →+ Obj (RingHom.id S) (Obj φ M) :=
     { toFun := fun x => tmul (RingHom.id S) x s
-      map_zero' := BalancedTensorProduct.zero_tmul s
-      map_add' := fun x y => BalancedTensorProduct.add_tmul x y s }
+      map_zero' := BalancedTensorProduct.zero_tmul ℤ _ s
+      map_add' := fun x y => BalancedTensorProduct.add_tmul ℤ _ x y s }
   -- At a fixed outer coefficient the inner maps are only additive.
   let lhs : Obj φ M →+ Obj φ M :=
     (compLinearEquiv φ (RingHom.id S) M).toLinearMap.toAddMonoidHom.comp tensor
@@ -104,7 +106,7 @@ theorem compLinearEquiv_id_right :
     (idLinearEquiv S (Obj φ M)).toLinearMap.toAddMonoidHom.comp tensor
   let : Module R S := φ.toModule
   have h : lhs = rhs := by
-    apply BalancedTensorProduct.hom_ext (R := R) (M := M) (N := S)
+    apply BalancedTensorProduct.addHom_ext (R := R) (M := M) (N := S)
     intro m a
     change compLinearEquiv φ (RingHom.id S) M
         (tmul (RingHom.id S) (tmul φ m a) s) =
@@ -144,25 +146,25 @@ theorem compLinearEquiv_assoc :
   -- Fixing the outer coefficient gives additive maps, not T-linear maps.
   let outerTensor : Obj ψ (Obj φ M) →+ Obj θ (Obj ψ (Obj φ M)) :=
     { toFun := fun x => tmul θ x u
-      map_zero' := BalancedTensorProduct.zero_tmul u
-      map_add' := fun x y => BalancedTensorProduct.add_tmul x y u }
+      map_zero' := BalancedTensorProduct.zero_tmul ℤ _ u
+      map_add' := fun x y => BalancedTensorProduct.add_tmul ℤ _ x y u }
   let lhs : Obj ψ (Obj φ M) →+ Obj (θ.comp (ψ.comp φ)) M :=
     firstRoute.toAddMonoidHom.comp outerTensor
   let rhs : Obj ψ (Obj φ M) →+ Obj (θ.comp (ψ.comp φ)) M :=
     secondRoute.toAddMonoidHom.comp outerTensor
   have outer : lhs = rhs := by
-    apply BalancedTensorProduct.hom_ext (R := S) (M := Obj φ M) (N := T)
+    apply BalancedTensorProduct.addHom_ext (R := S) (M := Obj φ M) (N := T)
       (g := lhs) (h := rhs)
     intro x t
     -- Fixing the next coefficient likewise gives additive, not S-linear, maps.
     let innerTensor : Obj φ M →+ Obj ψ (Obj φ M) :=
       { toFun := fun y => tmul ψ y t
-        map_zero' := BalancedTensorProduct.zero_tmul t
-        map_add' := fun y w => BalancedTensorProduct.add_tmul y w t }
+        map_zero' := BalancedTensorProduct.zero_tmul ℤ _ t
+        map_add' := fun y w => BalancedTensorProduct.add_tmul ℤ _ y w t }
     let lhs' : Obj φ M →+ Obj (θ.comp (ψ.comp φ)) M := lhs.comp innerTensor
     let rhs' : Obj φ M →+ Obj (θ.comp (ψ.comp φ)) M := rhs.comp innerTensor
     have inner : lhs' = rhs' := by
-      apply BalancedTensorProduct.hom_ext (R := R) (M := M) (N := S)
+      apply BalancedTensorProduct.addHom_ext (R := R) (M := M) (N := S)
         (g := lhs') (h := rhs')
       intro m s
       exact pure m s t u

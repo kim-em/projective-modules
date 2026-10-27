@@ -97,7 +97,8 @@ example :
   let : Module.Injective (Matrix (Fin 2) (Fin 2) ℚ) (Matrix (Fin 2) (Fin 2) ℚ) :=
     Module.injective_of_isSemisimpleRing (Matrix (Fin 2) (Fin 2) ℚ)
       (Matrix (Fin 2) (Fin 2) ℚ)
-  exact Module.injective_of_finite_projective (Matrix (Fin 2) (Fin 2) ℚ) Pcol
+  exact Module.Injective.of_finite_projective
+    (R := Matrix (Fin 2) (Fin 2) ℚ) (P := Pcol) inferInstance
 
 end MatrixColumn
 

@@ -72,9 +72,10 @@ original direct-sum monoid constructors. -/
 theorem mapRingHom_toAddMonoidHom (f : R →+* S) :
     ((mapRingHom f).toAddMonoidHom :
       @AddMonoidHom (ProjectiveClass R) (ProjectiveClass S)
-        (@KTheory.instAddCommMonoidProjectiveClass R rR.toRing).toAddMonoid.toAddZeroClass.toAddZero
-        (@KTheory.instAddCommMonoidProjectiveClass S
-          rS.toRing).toAddMonoid.toAddZeroClass.toAddZero) =
+        (TauCeti.instAddCommMonoidObjectCode
+          (C := ModuleCat.FiniteProjective.{uR, uR} Rᵐᵒᵖ)).toAddMonoid.toAddZeroClass.toAddZero
+        (TauCeti.instAddCommMonoidObjectCode
+          (C := ModuleCat.FiniteProjective.{uS, uS} Sᵐᵒᵖ)).toAddMonoid.toAddZeroClass.toAddZero) =
       @map R S rR.toRing rS.toRing f := rfl
 
 /-- Evaluation of the scalar-extension semiring homomorphism agrees with the

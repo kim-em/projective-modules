@@ -18,8 +18,8 @@ public import ProjectiveModules.Contraction.BaseChange
 public import ProjectiveModules.Dual.ModuleCat
 public import ProjectiveModules.Dual.Quotient
 public import ProjectiveModules.Dual.TensorProduct
-public import ProjectiveModules.ExteriorAlgebra.BaseChange
-public import ProjectiveModules.ExteriorPower.BaseChange
+public import Mathlib.LinearAlgebra.ExteriorAlgebra.BaseChange
+public import TauCeti.LinearAlgebra.ExteriorPower.BaseChange
 public import ProjectiveModules.ExteriorPower.Determinant
 public import ProjectiveModules.ExteriorPower.DeterminantLineBaseChange
 public import ProjectiveModules.ExteriorPower.DirectSum
@@ -67,7 +67,7 @@ public import ProjectiveModules.KTheory.Trace
 public import ProjectiveModules.KTheory.TraceNaturality
 public import ProjectiveModules.KTheory.ZeroRing
 public import ProjectiveModules.MatrixSpan
-public import ProjectiveModules.Module.BalancedTensorProduct
+public import ProjectiveModules.Module.BalancedTensorAdditive
 public import ProjectiveModules.Module.BalancedTensorExact
 public import ProjectiveModules.Module.Bidual
 public import ProjectiveModules.Module.ArbitraryLocalProjectiveFree
@@ -82,7 +82,7 @@ public import ProjectiveModules.Module.CommutingIdempotents
 public import ProjectiveModules.Module.FiniteProjectiveHom
 public import ProjectiveModules.Module.FiniteStabilization
 public import ProjectiveModules.Module.HomExact
-public import ProjectiveModules.Module.Injective
+public import TauCeti.Algebra.Module.Injective.SelfInjective
 public import ProjectiveModules.Module.InvariantSupportedProjection
 public import ProjectiveModules.Module.IsotypicMultiplicity
 public import ProjectiveModules.Module.MatrixRow
@@ -93,7 +93,7 @@ public import ProjectiveModules.Module.LocalProjectiveElement
 public import ProjectiveModules.Module.LocalRing
 public import ProjectiveModules.Module.LocallyConstantRank
 public import ProjectiveModules.Module.MinimalSupport
-public import ProjectiveModules.Module.PID
+public import TauCeti.LinearAlgebra.FreeModule.PID
 public import ProjectiveModules.Module.ProjectiveComplement
 public import ProjectiveModules.Module.ProjectiveKernel
 public import ProjectiveModules.Module.ProjectivePi
@@ -120,7 +120,7 @@ public import ProjectiveModules.Module.Trace
 public import ProjectiveModules.Module.Trace.BaseChange
 public import ProjectiveModules.Module.TransfiniteCoordinateFiltration
 public import ProjectiveModules.Module.TransfiniteRangeBasis
-public import ProjectiveModules.Order.CompactlyGenerated
+public import TauCeti.Order.CompactlyGenerated
 public import ProjectiveModules.KTheory.RankLocallyConstant
 public import ProjectiveModules.KTheory.RankLocallyConstantNaturality
 public import ProjectiveModules.KTheory.RankLocallyConstantRing

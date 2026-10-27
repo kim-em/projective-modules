@@ -144,7 +144,7 @@ private theorem firstIdeal_finite_projective_not_free :
 private theorem secondIdeal_finite_projective_not_free :
     Module.Finite (ℕ × ℕ) secondIdeal ∧ Module.Projective (ℕ × ℕ) secondIdeal ∧
       ¬ Module.Free (ℕ × ℕ) secondIdeal :=
-  ⟨Module.Finite.span_singleton _ _, second_isIdempotent.projective_span,
+  ⟨Module.Finite.span_singleton _ _, second_isIdempotent.projective_span_singleton,
     second_isIdempotent.not_free_span second_ne_zero second_ne_one⟩
 
 private theorem firstIdealProduct_finite_projective :

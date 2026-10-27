@@ -66,7 +66,7 @@ def firstCoordinateLine : Submodule ℚ (Fin 2 → ℚ) :=
 noncomputable def matrixFirstCoordinateLine :
     Submodule Mat2Q
       (matrixEquivalence.functor.obj (ModuleCat.of ℚ (Fin 2 → ℚ))) :=
-  ModuleCat.submoduleOrderIsoOfEquivalence matrixEquivalence
+  CategoryTheory.Equivalence.submoduleOrderIso matrixEquivalence
     (ModuleCat.of ℚ (Fin 2 → ℚ)) firstCoordinateLine
 
 /-- A coordinate line transports to a nonzero proper submodule of the image plane. -/
@@ -87,7 +87,7 @@ theorem matrixFirstCoordinateLine_nonzero_proper :
       rw [h]
       exact Submodule.mem_top
     simp [firstCoordinateLine, LinearMap.proj_apply] at hmem
-  let φ := ModuleCat.submoduleOrderIsoOfEquivalence matrixEquivalence
+  let φ := CategoryTheory.Equivalence.submoduleOrderIso matrixEquivalence
     (ModuleCat.of ℚ (Fin 2 → ℚ))
   change ⊥ < φ firstCoordinateLine ∧ φ firstCoordinateLine < ⊤
   constructor

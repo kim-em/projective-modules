@@ -8,6 +8,7 @@ module
 
 public import Mathlib.LinearAlgebra.TensorProduct.Pi
 public import Mathlib.RingTheory.Ideal.Pure
+public import Mathlib.RingTheory.Ideal.IdempotentFG
 public import Mathlib.RingTheory.Idempotents
 public import Mathlib.RingTheory.Spectrum.Prime.FreeLocus
 public import Mathlib.Topology.FiberPartition

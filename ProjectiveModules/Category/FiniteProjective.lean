@@ -11,6 +11,7 @@ public import Mathlib.Algebra.Category.ModuleCat.Projective
 public import Mathlib.CategoryTheory.ObjectProperty.FiniteProducts
 public import Mathlib.RingTheory.Finiteness.Basic
 public import Mathlib.RingTheory.Finiteness.Prod
+public import TauCeti.Algebra.Category.ModuleCat.CartanMap.Basic
 
 /-!
 # The category of finite projective modules
@@ -46,6 +47,14 @@ lemma isFiniteProjective_iff (P : ModuleCat.{uM} R) :
 abbrev FiniteProjective := (isFiniteProjective.{uR, uM} R).FullSubcategory
 
 namespace FiniteProjective
+
+/-- At the ring carrier universe, the universe-polymorphic category agrees
+with Tau Ceti's canonical finite-projective category. -/
+def tauCetiEquivalence :
+    FiniteProjective.{uR, uR} R ≌ (TauCeti.finiteProjectiveModules R).FullSubcategory :=
+  (CategoryTheory.Equivalence.refl (C := ModuleCat.{uR} R)).congrFullSubcategory (by
+    ext M
+    exact TauCeti.finiteProjectiveModules_iff)
 
 variable {R} in
 /-- The underlying type of a finite projective module. -/
@@ -150,5 +159,9 @@ instance isFiniteProjectiveIsClosedUnderFiniteProducts :
 noncomputable instance finiteProjectiveHasFiniteBiproducts :
     HasFiniteBiproducts (FiniteProjective.{uR, uM} R) :=
   HasFiniteBiproducts.of_hasFiniteProducts
+
+noncomputable instance finiteProjectiveHasBinaryBiproducts :
+    HasBinaryBiproducts (FiniteProjective.{uR, uM} R) :=
+  hasBinaryBiproducts_of_finite_biproducts _
 
 end ModuleCat

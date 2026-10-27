@@ -58,7 +58,7 @@ theorem rat_product_nonfree_stabilizer :
     exact zero_ne_one (congrArg (fun x : (ℚ × ℚ)ᵐᵒᵖ ↦ x.unop.2) h)
   have hfinite := Module.Finite.span_singleton (ℚ × ℚ)ᵐᵒᵖ
     (MulOpposite.op ((1 : ℚ), (0 : ℚ)))
-  have hprojective := he.projective_span
+  have hprojective := he.projective_span_singleton
   let _ : Module.Finite (ℚ × ℚ)ᵐᵒᵖ
       (Ideal.span {MulOpposite.op ((1 : ℚ), (0 : ℚ))}) := hfinite
   let _ : Module.Projective (ℚ × ℚ)ᵐᵒᵖ

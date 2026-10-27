@@ -66,8 +66,8 @@ examples and qualifications; links below go to the corresponding result families
   finite generation, finite dimension or commutativity of `R` is assumed.
 - **[Exterior constructions](docs/Overview.md#exterior-constructions):** full exterior
   algebra commutes with arbitrary scalar extension, and its equivalence identifies
-  homogeneous submodule images in every degree, without asserting a general tensor
-  equivalence of fixed-degree carriers. The fixed-ring binary fixed-degree Sum Formula
+  homogeneous submodule images in every degree. Tau Ceti supplies fixed-degree
+  carrier equivalences over arbitrary coefficient algebras. The fixed-ring Sum Formula
   is natural for module maps; projective exterior powers and determinants are also
   provided. The top exterior power of a finite projective module of constant stalk
   rank is invertible, including degree zero and the zero ring.
@@ -178,7 +178,7 @@ examples and qualifications; links below go to the corresponding result families
   is free over a ring with a proper two-sided ideal and unit complement, with no
   generation bound. The `IsLocalRing` form permits noncommutative rings and independent
   universes; split-range assembly itself requires explicitly free increments.
-- **[Finite projectives and injectivity](ProjectiveModules/Module/Injective.lean):**
+- **[Finite projectives and injectivity](https://github.com/TauCetiProject/TauCeti/blob/906780592fedf73008c25d5b4c16ae2321fc836d/TauCeti/Algebra/Module/Injective/SelfInjective.lean):**
   `Module.injective_of_finite_projective` shows that a finitely generated projective
   left module over an arbitrary left self-injective ring is injective, with
   independent scalar and carrier universes.
@@ -225,7 +225,7 @@ examples and qualifications; links below go to the corresponding result families
 - **[Submodule lattices and length](ProjectiveModules/Category/Length.lean):**
   ordinary equivalences `e : ModuleCat.{vR} R ≌ ModuleCat.{vS} S` over arbitrary
   rings give the canonical order isomorphism
-  `ModuleCat.submoduleOrderIsoOfEquivalence e X` on all submodules. For every
+  `e.submoduleOrderIso X` on all submodules. For every
   module `X`, `ModuleCat.length_eq_of_equivalence e X` gives
   `Module.length S (e.functor.obj X) = Module.length R X` in `ℕ∞`, including `⊤`;
   `ModuleCat.isFiniteLength_iff_of_equivalence e X` preserves and reflects the
@@ -264,7 +264,7 @@ examples and qualifications; links below go to the corresponding result families
   construction of Weibel, *The K-book*, II §2, extended to include the zero ring.
 - **[Tensor-product ring on K₀](ProjectiveModules/KTheory/Ring.lean):** for every
   commutative ring `R`, including the zero ring, the additive Grothendieck group
-  `K0 R` has the commutative-ring structure supplied by Group Theory's generic
+  `K0 R` has the commutative-ring structure supplied by Tau Ceti's generic
   completion API. Its additive group and whole `K0.ofClass` map are retained.
   `K0.ofClassRingHom` bundles the class map; the unit is the regular right-module
   generator, and multiplication of module generators computes `M ⊗[Rᵐᵒᵖ] N`,
@@ -508,7 +508,7 @@ Examples and regression clients build in the separate default test target.
 For the length theorems use `import ProjectiveModules.Category.Length`; they are
 not re-exported by the aggregate. This focused import also re-exports
 `ProjectiveModules.Category.SubmoduleEquivalence` for submodule transport.
-Given `e` and `X` as above, `ModuleCat.submoduleOrderIsoOfEquivalence e X` has type
+Given `e` and `X` as above, `e.submoduleOrderIso X` has type
 `Submodule R X ≃o Submodule S (e.functor.obj X)`; its `OrderIso` API provides
 order reflection, inverse transport and top/bottom preservation. The length
 and finite-length theorems apply to the same `e` and `X` without finiteness assumptions.
@@ -524,8 +524,8 @@ by the aggregate. The dual is reached through the contraction aggregate import.
 | [Dual](ProjectiveModules/Dual/BaseChange.lean), [Contraction](ProjectiveModules/Contraction/BaseChange.lean), [Invertible](ProjectiveModules/Invertible/OfRankOne.lean) | Dual/evaluation base change, rank-one iff, scalar endomorphisms and finite-summand cancellation |
 | [Invertible module topologies and continuous endomorphisms](ProjectiveModules/Invertible/Topology.lean) | `Module.Invertible.isModuleTopology` identifies the given module topology; `ContinuousLinearMap.scalarEndEquiv` identifies the scalar field with continuous endomorphisms in bounded convergence. Hausdorff invertible topological vector spaces over nontrivially normed fields, with independent scalar/carrier universes and no completeness, norm or chosen frame |
 | [Bidual evaluation](ProjectiveModules/Module/Bidual.lean) | Ordinary-coefficient bidual equivalence for finite projective semiring modules; forward/inverse evaluation, naturality and coefficient-preserving commutative comparison |
-| [Exterior algebra](ProjectiveModules/ExteriorAlgebra/BaseChange.lean), [exterior powers](ProjectiveModules/ExteriorPower/DirectSum.lean) | Full algebra base change; projective powers, determinants/top powers and binary fixed-degree Sum Formula |
-| [Homogeneous exterior base change](ProjectiveModules/ExteriorPower/BaseChange.lean) | `ExteriorAlgebra.equivBaseChange_map_exteriorPower`: image equality with the scalar-extended homogeneous submodule, for arbitrary degree and independent ring/carrier universes |
+| [Exterior algebra](https://github.com/leanprover-community/mathlib4/blob/2cabef97b63d3275776b8b060d802de6a6fa1055/Mathlib/LinearAlgebra/ExteriorAlgebra/BaseChange.lean), [exterior powers](ProjectiveModules/ExteriorPower/DirectSum.lean) | Full algebra base change; projective powers, determinants/top powers and binary fixed-degree Sum Formula |
+| [Homogeneous exterior base change](https://github.com/TauCetiProject/TauCeti/blob/906780592fedf73008c25d5b4c16ae2321fc836d/TauCeti/LinearAlgebra/ExteriorPower/BaseChange.lean) | `TauCeti.exteriorPower.equivBaseChange`: canonical fixed-degree carrier equivalence, without flatness, for arbitrary degree and independent ring/carrier universes |
 | [Invertible top exterior powers](ProjectiveModules/ExteriorPower/Invertible.lean) | `exteriorPower.invertible_of_rankAtStalk_eq`: the top exterior power of a finite projective module of constant stalk rank is invertible, without a nontrivial-ring hypothesis |
 | [Exterior vanishing](ProjectiveModules/ExteriorPower/StalkRank.lean) | `exteriorPower.subsingleton_of_rankAtStalk_lt`: an exterior power of a finite flat module vanishes above all stalk ranks, for arbitrary commutative rings and independent universes |
 | [Determinant lines](ProjectiveModules/ExteriorPower/DeterminantLine.lean) | `Module.DeterminantLine`: invertible for finite projective modules of variable stalk rank; linear-isomorphism invariance, rank-fiber recovery, product compatibility, zero and invertible-module comparisons as `Nonempty` isomorphisms |
@@ -538,7 +538,7 @@ by the aggregate. The dual is reached through the contraction aggregate import.
 | [Right matrix rows](ProjectiveModules/Module/MatrixRow.lean) | Canonical opposite-matrix row simplicity, fixed-row isotypy and arbitrary direct-sum decompositions |
 | [Scalar rank](ProjectiveModules/Module/ScalarRank.lean) | Compatible-scalar rank times fixed-simple multiplicity; canonical noncommutative right matrix-row dimension |
 | [Finite stable presentations](ProjectiveModules/Free/StablePresentation.lean) | Arbitrary-ring finite/stably-free existence equivalence; IBN-only cross-sum and integer-difference invariance for semirings |
-| [Balanced tensor](ProjectiveModules/Module/BalancedTensorProduct.lean), [right extension](ProjectiveModules/Module/RightExtension.lean) | Right-module scalar extension over arbitrary ring homomorphisms, quotients, finite free coordinates |
+| [Balanced tensor](ProjectiveModules/Module/BalancedTensorAdditive.lean), [right extension](ProjectiveModules/Module/RightExtension.lean) | Right-module scalar extension over arbitrary ring homomorphisms, quotients, finite free coordinates |
 | [Left coefficient products](ProjectiveModules/Module/Product.lean) | `Module.finite_pi` and `Module.projective_pi`: finite-family closure over the coefficient semiring product for the canonical pointwise left action, with independent index, coefficient and carrier universes |
 | [Right coefficient products](ProjectiveModules/Module/RightProduct.lean) | Named Pi/binary opposite-scalar actions; finite arbitrary-projective closure; canonical finite-projective bundles; coordinate recovery and finite reconstruction along projection scalar extension, with independent universes |
 | [Right coefficient-product maps](ProjectiveModules/Module/RightProduct/Hom.lean) | `Module.piRightHomAddEquiv`: additive component correspondence for maps linear under the canonical right coefficient-product action on arbitrary-index families over semirings with additive-commutative-monoid fibers; supported-input components, coordinatewise inverse, identity and composition laws. `Module.piRightEndEquiv`: semiring equivalence with the family of factor endomorphism semirings, using the same additive data and `f * g = f.comp g`; independent index, coefficient and carrier universes, without finiteness, finite generation, projectivity, presentation or commutativity assumptions |
@@ -553,7 +553,7 @@ by the aggregate. The dual is reached through the contraction aggregate import.
 | [Split kernels](ProjectiveModules/Module/ProjectiveKernel.lean) | Over a semiring `R`, with additive-group source `M` and additive-monoid target `A`, the imported `LinearMap.kerProdEquivOfRightInverse` gives `(ker f × A) ≃ₗ[R] M` for a specified linear section of `f : M →ₗ[R] A`; kernel projection/application and inclusion-retraction laws; independent finite-source and projective-source closure, without target finiteness or projectivity and with independent universes |
 | [Commuting idempotent endomorphisms](ProjectiveModules/Module/CommutingIdempotents.lean) | `LinearMap.commutingIdempotentsEquiv`: four range/kernel intersections for two commuting idempotents on an additive-commutative-group module over any semiring, with independent universes. Four `[simp]` coordinate equations apply `p * q`, `p * (1 - q)`, `(1 - p) * q` and `(1 - p) * (1 - q)`; the inverse `[simp]` equation sums the underlying components as `(a + b) + (c + d)` |
 | [Complements](ProjectiveModules/Module/ProjectiveComplement.lean) | Over a ring `R`, with additive-group modules `F`, `P` and projective target `P`, `Module.Projective.prodKerEquivOfSurjective` chooses a section of a surjection `f : F →ₗ[R] P` and gives `(P × ker f) ≃ₗ[R] F`; finite projective modules have finite complements in finite standard free modules |
-| [Injectivity](ProjectiveModules/Module/Injective.lean) | Finitely generated projective left modules over an arbitrary left self-injective ring are injective, with independent scalar and carrier universes |
+| [Injectivity](https://github.com/TauCetiProject/TauCeti/blob/906780592fedf73008c25d5b4c16ae2321fc836d/TauCeti/Algebra/Module/Injective/SelfInjective.lean) | Finitely generated projective left modules over an arbitrary left self-injective ring are injective, with independent scalar and carrier universes |
 | [Right inverse defects](ProjectiveModules/Module/RightRegularDefect.lean), [Hom exactness](ProjectiveModules/Module/HomExact.lean) | Specified right regular decomposition and defect kernel over rings; additive Hom exactness over semirings |
 | [Continuous projective lifting](ProjectiveModules/Topology/Projective.lean) | `ContinuousLinearMap.projective_lifting_property`: continuous linear lifts from projective modules with their module topology over a semiring with a scalar topology; continuous addition and scalar multiplication on the target of the lift, with no operation-continuity assumption on the common codomain |
 | [Finite commuting projections](ProjectiveModules/Module/CommutingProjections.lean) | `LinearMap.commutingIdempotentsPiEquiv`: simultaneous decomposition of the original module by a finite pairwise commuting idempotent family over a semiring, for an additive commutative group module; all original range/kernel intersections, Boolean product projectors, component action and inverse inclusion sum, including zero blocks and empty constraints |
@@ -563,11 +563,11 @@ by the aggregate. The dual is reached through the contraction aggregate import.
 | [Trace and scalar extension](ProjectiveModules/Module/Trace/BaseChange.lean) | `traceOfFiniteProjective_baseChange`: contraction trace on the canonical tensor-product scalar extension is the image of the source trace for finite projective additive-commutative-monoid modules over commutative semirings; independent scalar and carrier universes, without freeness, flatness or finiteness of the scalar extension. `traceOfFiniteProjective_baseChange_iff_trace` identifies the formula with Mathlib's finite-free trace identity over commutative rings |
 | [Partial trace](ProjectiveModules/Module/Trace/Partial.lean) | `partialTraceOfFiniteProjective`: linear contraction of arbitrary maps `M ⊗ N →ₗ M ⊗ P` to maps `N →ₗ P` over a commutative semiring, with only the traced factor `M` finite projective and four independent universes. The all-map evaluation formula uses the canonical tensor–Hom inverse; on `TensorProduct.map a b` the result is `traceOfFiniteProjective R M a • b`, without normalization. On `V = Fin 2 → ℕ`, tensor symmetry has partial trace `id` |
 | [Finite-projective category](ProjectiveModules/Category/FiniteProjective.lean), [stable category](ProjectiveModules/Category/Stable.lean) | Finite biproducts, preadditive stable quotient and small-ring Ext¹ detection |
-| [Projective scalar towers](ProjectiveModules/Module/ScalarRestriction.lean), [finite-projective restriction](ProjectiveModules/Category/FiniteProjectiveRestriction.lean) | Projectivity through semiring towers with projective coefficients; finite-projective ring-homomorphism restriction under its canonical coefficient hypothesis, with carrier, stored-action and map-application laws, both directions of the underlying-functor comparison, and identity/composition functor laws |
+| [Projective scalar towers](https://github.com/TauCetiProject/TauCeti/blob/906780592fedf73008c25d5b4c16ae2321fc836d/TauCeti/Algebra/Module/Projective/Trans.lean), [finite-projective restriction](ProjectiveModules/Category/FiniteProjectiveRestriction.lean) | Projectivity through semiring towers with projective coefficients; finite-projective ring-homomorphism restriction under its canonical coefficient hypothesis, with carrier, stored-action and map-application laws, both directions of the underlying-functor comparison, and identity/composition functor laws |
 | [Module-category equivalences](ProjectiveModules/Category/ModuleEquivalence.lean) | Finite-generation preservation and reflection at independent universes; canonical finite-presentation preservation with unrestricted source and target at the scalar/carrier maximum, and preservation and reflection with both carriers at their maxima; the same bounds for finite projectivity; left self-injectivity of the two rings is equivalent under any given equivalence with both carriers at their scalar/carrier maxima |
 | [Noetherian objects, modules and rings](ProjectiveModules/Category/Noetherian.lean) | Canonical subobject/submodule ascending-chain bridge; Noetherian-module preservation and reflection at independent universes; left-Noetherian ring transport with target at the scalar/carrier maximum and unrestricted source, and ring iff at both maxima |
 | [Submodule equivalences](ProjectiveModules/Category/SubmoduleEquivalence.lean), [length](ProjectiveModules/Category/Length.lean) | Canonical submodule order isomorphism, numerical length equality in `ℕ∞` for all modules (including `⊤`), and finite-length equivalence; arbitrary rings and independent scalar/carrier universes, without maximum-universe or finiteness hypotheses |
-| [Compact elements](ProjectiveModules/Order/CompactlyGenerated.lean) | Order isomorphisms preserve and reflect compact elements of arbitrary partial orders; no completeness or top element required |
+| [Compact elements](https://github.com/TauCetiProject/TauCeti/blob/906780592fedf73008c25d5b4c16ae2321fc836d/TauCeti/Order/CompactlyGenerated.lean) | Order isomorphisms preserve and reflect compact elements of arbitrary partial orders; no completeness or top element required |
 | [Finite-projective representatives](ProjectiveModules/Category/FiniteProjectiveSmallness.lean) | Derived ring-universe essential smallness at independent carrier universes; ring-sized representatives, linear equivalences and class equality in one reference skeleton |
 | [Finite dimension](ProjectiveModules/Category/FiniteModuleDimension.lean) | Finite-rank representative transport; finite-free categorical isomorphism criteria over strong-rank-condition rings |
 | [Finite stabilization](ProjectiveModules/Module/FiniteStabilization.lean) | Replace a finite projective common stabilizer by a common standard finite free one; no hypotheses on the two ambient modules |
@@ -586,7 +586,7 @@ by the aggregate. The dual is reached through the contraction aggregate import.
 | [K₀ dimension](ProjectiveModules/KTheory/Rank.lean), [zero rings](ProjectiveModules/KTheory/ZeroRing.lean) | Dimension classifications of projective classes by ℕ and K₀ by ℤ over division rings, and bijectivity of division-ring scalar-extension maps; entire class/group collapse over subsingleton rings |
 | [Locally constant module rank](ProjectiveModules/Module/RankLocallyConstant.lean) | Characteristic laws for the existing `Module.rankLocallyConstant`: linear-isomorphism invariance, zero and regular-unit normalizations, finite dependent-product and binary-product addition, tensor multiplication and arbitrary-algebra pullback, including zero rings and empty indices |
 | [Rank realization](ProjectiveModules/Module/LocallyConstantRank.lean), [fibers](ProjectiveModules/Module/RankFiberDecomposition.lean), [component models](ProjectiveModules/Module/ComponentwiseFree.lean) | Locally constant ranks, commuting complete orthogonal Cartesian refinements over semirings, and conditional componentwise-free classification |
-| [PID](ProjectiveModules/Module/PID.lean), [Laurent](ProjectiveModules/Module/LaurentPolynomial.lean) | Arbitrary-rank commutative PID freeness; one-variable Laurent finite-projective freeness |
+| [PID](https://github.com/TauCetiProject/TauCeti/blob/906780592fedf73008c25d5b4c16ae2321fc836d/TauCeti/LinearAlgebra/FreeModule/PID.lean), [Laurent](ProjectiveModules/Module/LaurentPolynomial.lean) | Arbitrary-rank commutative PID freeness; one-variable Laurent finite-projective freeness |
 
 `tests/ProjectiveModulesTests/ComponentwiseFreeClient.lean` and
 `tests/PublicAPIClient.lean` and
@@ -606,7 +606,7 @@ These are library declarations reusing pinned dependencies, not whole-book cover
 
 ## Build
 
-The project pins Lean `v4.34.0-rc2`; `lakefile.toml` and
+The project pins Lean `v4.36.0-rc1`; `lakefile.toml` and
 `lake-manifest.json` fix the dependency graph. Install the pinned toolchain and
 fetch the matching mathlib cache **before** building. Both existing default
 roots are built by:
@@ -623,13 +623,15 @@ check after the cache fetch is `lake build ProjectiveModules` or
 private importing clients for finite-projective modules and right-extension
 comparison coherence, which can report a `privateModule` warning. These
 ordinary commands do not make warnings fatal. The root resolves
-mathlib `83abb3e776bdefcbc447a1e44d0debe4010039e5`, GLG
+Mathlib `2cabef97b63d3275776b8b060d802de6a6fa1055`, GLG
 `c9705889a85f85cc89d92d21372bb9bc360162c8` and Stable Range
 [`c283b01ed9ebc33c7eefcdb4f3d2ca45141f469e`](https://github.com/FormalFrontier/stable-range/commit/c283b01ed9ebc33c7eefcdb4f3d2ca45141f469e),
-with Group Theory
-[`f281c55aed3829a2d55f1d7cd35137ed15b125c3`](https://github.com/FormalFrontier/group-theory/commit/f281c55aed3829a2d55f1d7cd35137ed15b125c3).
-These three libraries declare the same mathlib revision and Lean `4.34.0-rc2`
-toolchain as this root.
+and Tau Ceti
+[`906780592fedf73008c25d5b4c16ae2321fc836d`](https://github.com/TauCetiProject/TauCeti/commit/906780592fedf73008c25d5b4c16ae2321fc836d).
+The root resolves one Lean 4.36.0-rc1 / Mathlib environment for the package graph.
+GLG and Stable Range retain older dependency declarations; they are built against
+this root's resolved pins. Group Theory is no longer a dependency: Tau Ceti supplies
+the Grothendieck-ring API.
 Dependencies are not vendored.
 
 ## Documentation limits
@@ -673,8 +675,8 @@ See [credits](docs/CREDITS.md)
 for truthful roles and provenance. These credits do not assign copyright
 ownership, assert human mathematical review or source-author endorsement,
 or relicense dependency code or Weibel’s book; no book text or PDF is shipped.
-The balanced-tensor and right-extension interfaces follow Formal Frontier's
-foundational formalization and its maintenance; Formal Frontier contributed the
+The balanced-tensor carrier and outer actions come from Tau Ceti; the retained
+right-extension interfaces follow Formal Frontier's formalization and maintenance; Formal Frontier contributed the
 identity/composition comparisons and their pointwise unit and associativity
 laws, using Mathlib's ring-homomorphism and linear-map interfaces.
 The commutative-base comparisons additionally reuse Mathlib's tensor
@@ -684,7 +686,7 @@ formalization. These tensor comparison interfaces were contributed by Formal Fro
 The commuting-idempotent refinement follows Andrew Yang's Mathlib idempotent-family
 interfaces and orthogonality-and-sum criterion.
 The tensor-product K₀ ring reuses this library's projective-class tensor semiring,
-Formal Frontier Group Theory's additive Grothendieck ring and universal property,
+Tau Ceti's additive Grothendieck ring and universal property,
 and Alex J. Best and Yaël Dillies' Mathlib completion formalization.
 Scalar extension on the tensor semiring of projective classes descends these
 comparisons through the existing additive class maps, following Weibel's

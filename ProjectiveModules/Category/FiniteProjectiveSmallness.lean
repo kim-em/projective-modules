@@ -6,6 +6,7 @@ module
 
 public import ProjectiveModules.Category.FiniteProjective
 public import Mathlib.Algebra.Category.FGModuleCat.EssentiallySmall
+public import TauCeti.CategoryTheory.GrothendieckGroup.ObjectCodeMonoid
 
 /-!
 # Smallness and representatives of finite projective modules
@@ -32,7 +33,7 @@ corresponding interfaces for right `R`-modules.
 ## References and credits
 
 This file reuses Mathlib's finite-module representatives, essentially small
-finitely generated module category, skeletons and full-subcategory machinery.
+finitely generated module category, object codes and full-subcategory machinery.
 It extends the finite-projective category formalization in this library.
 -/
 
@@ -105,10 +106,10 @@ theorem nonempty_iso_iff_linearEquiv :
     Nonempty (X ≅ Y) ↔ Nonempty (X ≃ₗ[R] Y) :=
   ⟨fun ⟨e⟩ ↦ ⟨isoToLinearEquiv e⟩, fun ⟨e⟩ ↦ ⟨isoOfLinearEquiv e⟩⟩
 
-/-- Equality of skeleton classes is exactly linear equivalence. -/
-theorem toSkeleton_eq_iff_linearEquiv (X Y : FiniteProjective.{u, v} R) :
-    toSkeleton X = toSkeleton Y ↔ Nonempty (X ≃ₗ[R] Y) := by
-  rw [toSkeleton_eq_toSkeleton_iff, nonempty_iso_iff_linearEquiv]
+/-- Equality of object codes is exactly linear equivalence. -/
+theorem objectCode_eq_iff_linearEquiv (X Y : FiniteProjective.{u, v} R) :
+    TauCeti.objectCode X = TauCeti.objectCode Y ↔ Nonempty (X ≃ₗ[R] Y) := by
+  rw [TauCeti.objectCode_eq_objectCode_iff, nonempty_iso_iff_linearEquiv]
 
 end Isomorphisms
 
@@ -157,11 +158,11 @@ theorem reprIsoOfLinearEquiv_inv_apply (e : P ≃ₗ[R] Q) (x : repr R Q) :
     homLinearEquiv R _ _ (reprIsoOfLinearEquiv R P Q e).inv x =
       (reprEquiv R P).symm (e.symm (reprEquiv R Q x)) := rfl
 
-/-- Equality of the reference-category classes of arbitrary inputs is
+/-- Equality of the reference-category codes of arbitrary inputs is
 characterized by linear equivalence of those inputs. -/
-theorem toSkeleton_repr_eq_iff :
-    toSkeleton (repr R P) = toSkeleton (repr R Q) ↔ Nonempty (P ≃ₗ[R] Q) := by
-  rw [toSkeleton_eq_toSkeleton_iff]
+theorem objectCode_repr_eq_iff :
+    TauCeti.objectCode (repr R P) = TauCeti.objectCode (repr R Q) ↔ Nonempty (P ≃ₗ[R] Q) := by
+  rw [TauCeti.objectCode_eq_objectCode_iff]
   constructor
   · rintro ⟨e⟩
     exact ⟨(reprEquiv R P).symm.trans ((isoToLinearEquiv e).trans (reprEquiv R Q))⟩
@@ -197,12 +198,12 @@ theorem reprIso_hom (X : FiniteProjective.{u, u} R) :
 theorem reprIso_inv (X : FiniteProjective.{u, u} R) :
     homLinearEquiv R _ _ (reprIso R X).inv = (reprEquiv R X).symm.toLinearMap := rfl
 
-/-- Representation leaves the skeleton class of a reference-category object
+/-- Representation leaves the object code of a reference-category object
 unchanged. -/
 @[simp]
-theorem toSkeleton_repr (X : FiniteProjective.{u, u} R) :
-    toSkeleton (repr R X) = toSkeleton X :=
-  congr_toSkeleton_of_iso (reprIso R X)
+theorem objectCode_repr (X : FiniteProjective.{u, u} R) :
+    TauCeti.objectCode (repr R X) = TauCeti.objectCode X :=
+  TauCeti.objectCode_congr (reprIso R X)
 
 /-- Any subsingleton module is represented by an object isomorphic to the zero
 module, without a nontriviality assumption on the ring. -/
@@ -220,12 +221,12 @@ theorem reprZeroIso_inv_apply (Z : Type v) [AddCommGroup Z] [Module R Z]
     [Subsingleton Z] (x : PUnit.{u + 1}) :
     homLinearEquiv R _ _ (reprZeroIso R Z).inv x = (reprEquiv R Z).symm 0 := rfl
 
-/-- The skeleton class of a represented zero module is the zero-module class. -/
+/-- The object code of a represented zero module is the zero-module class. -/
 @[simp]
-theorem toSkeleton_repr_zero (Z : Type v) [AddCommGroup Z] [Module R Z]
+theorem objectCode_repr_zero (Z : Type v) [AddCommGroup Z] [Module R Z]
     [Subsingleton Z] :
-    toSkeleton (repr R Z) = toSkeleton (of R PUnit.{u + 1}) :=
-  congr_toSkeleton_of_iso (reprZeroIso R Z)
+    TauCeti.objectCode (repr R Z) = TauCeti.objectCode (of R PUnit.{u + 1}) :=
+  TauCeti.objectCode_congr (reprZeroIso R Z)
 
 /-- Lifting an input carrier does not change its ring-universe representative
 up to isomorphism. -/
@@ -244,51 +245,12 @@ theorem reprULiftIso_inv_apply (P : Type v) [AddCommGroup P] [Module R P]
     homLinearEquiv R _ _ (reprULiftIso.{u, v, w} R P).inv x =
       (reprEquiv R (ULift.{w} P)).symm ⟨reprEquiv R P x⟩ := rfl
 
-/-- The skeleton class of a representative is invariant under carrier lift. -/
+/-- The object code of a representative is invariant under carrier lift. -/
 @[simp]
-theorem toSkeleton_repr_ulift (P : Type v) [AddCommGroup P] [Module R P]
+theorem objectCode_repr_ulift (P : Type v) [AddCommGroup P] [Module R P]
     [Module.Finite R P] [Module.Projective R P] :
-    toSkeleton (repr R (ULift.{w} P)) = toSkeleton (repr R P) :=
-  congr_toSkeleton_of_iso (reprULiftIso R P)
-
-section IsomorphismClasses
-
-variable (P : Type v) [AddCommGroup P] [Module R P]
-  [Module.Finite R P] [Module.Projective R P]
-
-/-- The isomorphism class of an arbitrary finite projective module in the
-skeleton of the ring-universe reference category. -/
-noncomputable def isoClass : Skeleton (FiniteProjective.{u, u} R) :=
-  toSkeleton (repr R P)
-
-/-- The class is computed from the chosen ring-universe representative. -/
-theorem isoClass_eq_toSkeleton_repr : isoClass R P = toSkeleton (repr R P) := rfl
-
-/-- Classes of inputs with independent carrier universes agree exactly when
-those inputs are linearly equivalent. Both classes lie in the same skeleton. -/
-theorem isoClass_eq_iff (Q : Type w) [AddCommGroup Q] [Module R Q]
-    [Module.Finite R Q] [Module.Projective R Q] :
-    isoClass R P = isoClass R Q ↔ Nonempty (P ≃ₗ[R] Q) :=
-  toSkeleton_repr_eq_iff R P Q
-
-/-- On reference-category objects, `isoClass` is the existing skeleton map. -/
-@[simp]
-theorem isoClass_of (X : FiniteProjective.{u, u} R) :
-    isoClass R X = toSkeleton X :=
-  toSkeleton_repr R X
-
-/-- Lifting the carrier does not change its class in the reference skeleton. -/
-@[simp]
-theorem isoClass_ulift : isoClass R (ULift.{w} P) = isoClass R P :=
-  toSkeleton_repr_ulift R P
-
-/-- Subsingleton modules have the zero-module class, over any ring. -/
-@[simp]
-theorem isoClass_zero (Z : Type v) [AddCommGroup Z] [Module R Z] [Subsingleton Z] :
-    isoClass R Z = toSkeleton (of R PUnit.{u + 1}) :=
-  toSkeleton_repr_zero R Z
-
-end IsomorphismClasses
+    TauCeti.objectCode (repr R (ULift.{w} P)) = TauCeti.objectCode (repr R P) :=
+  TauCeti.objectCode_congr (reprULiftIso R P)
 
 end FiniteProjective
 

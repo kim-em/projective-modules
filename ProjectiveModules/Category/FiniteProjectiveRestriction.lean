@@ -5,7 +5,7 @@ Authors: Formal Frontier Agents
 module
 
 public import ProjectiveModules.Category.FiniteProjective
-public import ProjectiveModules.Module.ScalarRestriction
+public import TauCeti.Algebra.Module.Projective.Trans
 public import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 public import Mathlib.Algebra.Module.Equiv.Opposite
 

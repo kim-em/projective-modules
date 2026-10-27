@@ -18,7 +18,7 @@ function is the original rank function, with the original opposite-ring action.
 
 `KTheory.K0.rankLocallyConstantRingHom` is the Grothendieck additive group's
 ring lift after the canonical natural-to-integer cast. Its additive
-projection is definitionally the original `K0.lift`, not a second completion.
+projection agrees with the original `K0.lift`.
 Neither construction assumes a nonempty spectrum or constant rank.
 
 The proofs use this library's representative and tensor-product APIs, the module
@@ -101,7 +101,7 @@ theorem rankLocallyConstantRingHom_of_module
     [Module.Finite Rᵐᵒᵖ M] [Module.Projective Rᵐᵒᵖ M] :
     rankLocallyConstantRingHom R (of R M) =
       LocallyConstant.comap
-        (toContinuousMap (PrimeSpectrum.homeomorphOfRingEquiv (RingEquiv.toOpposite R)))
+        (ContinuousMap.ofClass (PrimeSpectrum.homeomorphOfRingEquiv (RingEquiv.toOpposite R)))
         (Module.rankLocallyConstant Rᵐᵒᵖ M) :=
   rankLocallyConstant_of_module R M
 
@@ -120,7 +120,7 @@ theorem rankLocallyConstantRingHom_unique
     (h : ∀ X : ModuleCat.FiniteProjective.{uR, uR} Rᵐᵒᵖ,
       F (of R X) =
         LocallyConstant.comap
-          (toContinuousMap (PrimeSpectrum.homeomorphOfRingEquiv (RingEquiv.toOpposite R)))
+          (ContinuousMap.ofClass (PrimeSpectrum.homeomorphOfRingEquiv (RingEquiv.toOpposite R)))
           (Module.rankLocallyConstant Rᵐᵒᵖ X)) :
     F = rankLocallyConstantRingHom R := by
   apply RingHom.ext
@@ -150,19 +150,25 @@ noncomputable def rankLocallyConstantRingHom :
     ((LocallyConstant.mapRingHom (Nat.castRingHom ℤ)).comp
       (ProjectiveClass.rankLocallyConstantRingHom R))
 
-/-- The whole additive projection is definitionally the additive universal lift. -/
+/-- The whole additive projection agrees with the additive universal lift. -/
 theorem rankLocallyConstantRingHom_toAddMonoidHom :
     (rankLocallyConstantRingHom R).toAddMonoidHom =
       K0.lift R
         (((LocallyConstant.mapRingHom (Nat.castRingHom ℤ)).comp
-          (ProjectiveClass.rankLocallyConstantRingHom R)).toAddMonoidHom) := rfl
+          (ProjectiveClass.rankLocallyConstantRingHom R)).toAddMonoidHom) := by
+  apply hom_ext_ofClass R
+  intro a
+  change Algebra.GrothendieckAddGroup.liftRingHom _
+    (Algebra.GrothendieckAddGroup.of a) = _
+  rw [Algebra.GrothendieckAddGroup.liftRingHom_apply_of, lift_ofClass]
+  rfl
 
 /-- On a class generator, K₀ rank is the canonical cast of its natural-valued rank. -/
 theorem rankLocallyConstantRingHom_ofClass (a : ProjectiveClass R) :
     rankLocallyConstantRingHom R (ofClass R a) =
       LocallyConstant.mapRingHom (Nat.castRingHom ℤ)
         (ProjectiveClass.rankLocallyConstantRingHom R a) :=
-  Algebra.GrothendieckAddGroup.liftRingHom_of _ a
+  Algebra.GrothendieckAddGroup.liftRingHom_apply_of _ a
 
 /-- Bundled compatibility with the original class inclusion. -/
 @[simp]
@@ -172,7 +178,8 @@ theorem rankLocallyConstantRingHom_comp_ofClassRingHom :
         (ProjectiveClass.rankLocallyConstantRingHom R) := by
   apply RingHom.ext
   intro a
-  exact rankLocallyConstantRingHom_ofClass R a
+  simpa only [RingHom.comp_apply, ofClassRingHom_apply] using
+    rankLocallyConstantRingHom_ofClass R a
 
 /-- K₀ rank on an arbitrary finite-projective right module, retaining its action. -/
 @[simp]
@@ -182,7 +189,7 @@ theorem rankLocallyConstantRingHom_of
     rankLocallyConstantRingHom R (of R M) =
       LocallyConstant.mapRingHom (Nat.castRingHom ℤ)
         (LocallyConstant.comap
-          (toContinuousMap (PrimeSpectrum.homeomorphOfRingEquiv (RingEquiv.toOpposite R)))
+          (ContinuousMap.ofClass (PrimeSpectrum.homeomorphOfRingEquiv (RingEquiv.toOpposite R)))
           (Module.rankLocallyConstant Rᵐᵒᵖ M)) := by
   rw [← ofClass_of, rankLocallyConstantRingHom_ofClass,
     ProjectiveClass.rankLocallyConstantRingHom_of_module]
@@ -206,7 +213,9 @@ theorem rankLocallyConstantRingHom_unique
         LocallyConstant.mapRingHom (Nat.castRingHom ℤ)
           (ProjectiveClass.rankLocallyConstantRingHom R a)) :
     F = rankLocallyConstantRingHom R := by
-  exact (Algebra.GrothendieckAddGroup.liftRingHom_unique _ F h).symm
+  apply Algebra.GrothendieckAddGroup.ringHom_ext
+  intro a
+  exact (h a).trans (rankLocallyConstantRingHom_ofClass R a).symm
 
 /-- The existing additive universal property checks equality with K₀ rank on modules. -/
 theorem rankLocallyConstantRingHom_ext

@@ -51,6 +51,8 @@ tensor product and the supported coordinate idempotents.
 
 @[expose] public section
 
+open TauCeti
+
 universe uι uR uS uM uN
 
 namespace Module
@@ -809,7 +811,7 @@ noncomputable def piLinearEquiv [Finite ι]
   let Ei := fun i => ModuleCat.of (Ri i)ᵐᵒᵖ (Obj (Pi.evalRingHom Ri i) M)
   let q : ∀ i, Obj (Pi.evalRingHom Ri i) M →+ M := fun i => by
     letI : Module (∀ j, Ri j) (Ri i) := (Pi.evalRingHom Ri i).toModule
-    exact BalancedTensorProduct.lift (R := ∀ j, Ri j) (M := M) (N := Ri i)
+    exact BalancedTensorProduct.liftAddHom (R := ∀ j, Ri j) (M := M) (N := Ri i)
       { toFun := fun m r => MulOpposite.op (Pi.single i r) • m
         map_zero_left := fun r => smul_zero _
         map_add_left := fun m n r => smul_add _ m n
@@ -827,14 +829,13 @@ noncomputable def piLinearEquiv [Finite ι]
       q i (tmul (Pi.evalRingHom Ri i) m r) = MulOpposite.op (Pi.single i r) • m := by
     intro i m r
     let _ : Module (∀ j, Ri j) (Ri i) := (Pi.evalRingHom Ri i).toModule
-    exact BalancedTensorProduct.lift_tmul (R := ∀ j, Ri j) (M := M) (N := Ri i) _ m r
+    exact BalancedTensorProduct.liftAddHom_tmul (R := ∀ j, Ri j) (M := M) (N := Ri i) _ m r
   have q_smul : ∀ i (a : ∀ j, Ri j) (z : Obj (Pi.evalRingHom Ri i) M),
       q i (MulOpposite.op (a i) • z) = MulOpposite.op a • q i z := by
     intro i a z
     let _ : Module (∀ j, Ri j) (Ri i) := (Pi.evalRingHom Ri i).toModule
     induction z using BalancedTensorProduct.induction_on with
-    | zero => simp
-    | pure m r =>
+    | ht m r =>
         change q i (MulOpposite.op (a i) • tmul (Pi.evalRingHom Ri i) m r) =
           MulOpposite.op a • q i (tmul (Pi.evalRingHom Ri i) m r)
         rw [tmul_smul, q_tmul, q_tmul]
@@ -844,9 +845,7 @@ noncomputable def piLinearEquiv [Finite ι]
         change MulOpposite.op (Pi.single i (r * a i)) • m =
           MulOpposite.op (Pi.single i r * a) • m
         rw [Pi.single_mul_left r]
-    | neg z hz =>
-        rw [smul_neg, (q i).map_neg, hz, (q i).map_neg, smul_neg]
-    | add z w hz hw =>
+    | ha z w hz hw =>
         rw [smul_add, (q i).map_add, hz, hw, (q i).map_add, smul_add]
   let T : M →ₗ[(∀ i, Ri i)ᵐᵒᵖ] ModuleCat.piRight Ri Ei :=
     { toFun := fun m i => tmul (Pi.evalRingHom Ri i) m 1
@@ -900,7 +899,7 @@ noncomputable def piLinearEquiv [Finite ι]
         map_add' := fun x y => ModuleCat.piRightSingle_add Ri Ei i x y }
     let _ : Module (∀ j, Ri j) (Ri i) := (Pi.evalRingHom Ri i).toModule
     exact DFunLike.congr_fun
-      (BalancedTensorProduct.hom_ext (R := ∀ j, Ri j) (M := M) (N := Ri i)
+      (BalancedTensorProduct.addHom_ext (R := ∀ j, Ri j) (M := M) (N := Ri i)
         (g := T.toAddMonoidHom.comp (q i)) (h := si) fun m r => by
           change T (q i (tmul (Pi.evalRingHom Ri i) m r)) =
             ModuleCat.piRightSingle Ri Ei i (tmul (Pi.evalRingHom Ri i) m r)

@@ -9,12 +9,13 @@ module
 public import Mathlib.LinearAlgebra.ExteriorPower.Basic
 import Mathlib.LinearAlgebra.ExteriorAlgebra.Grading
 import Mathlib.LinearAlgebra.TensorProduct.Tower
+import Mathlib.LinearAlgebra.TensorProduct.Prod
 import Mathlib.LinearAlgebra.Pi
 public import Mathlib.RingTheory.Finiteness.Prod
 public import Mathlib.RingTheory.PicardGroup
 public import ProjectiveModules.Module.RankLocallyConstant
 public import ProjectiveModules.ExteriorPower.Invertible
-import ProjectiveModules.ExteriorPower.BaseChange
+import TauCeti.LinearAlgebra.ExteriorPower.BaseChange
 import ProjectiveModules.ExteriorPower.ProdPairing
 import ProjectiveModules.Module.Product
 import ProjectiveModules.Module.ComponentwiseFree
@@ -602,33 +603,8 @@ theorem determinantLine_component_baseChange (S : Type w) [CommRing S] [Algebra 
   let A := rankFiberRing R P i
   let M := rankFiberModule R P i
   let n := rankFiberRank R P i
-  -- Homogeneous inclusion is split, so tensoring it needs no flatness assumption.
-  let retract : ExteriorAlgebra A M →ₗ[A] (⋀[A]^n M) :=
-    (DirectSum.component A ℕ (fun k : ℕ ↦ ⋀[A]^k M) n).comp
-      (ExteriorAlgebra.GradedAlgebra.liftι A M).toLinearMap
-  have hsplit : retract.comp (⋀[A]^n M).subtype = LinearMap.id := by
-    apply LinearMap.ext
-    intro x
-    change DirectSum.component A ℕ (fun k : ℕ ↦ ⋀[A]^k M) n
-      (ExteriorAlgebra.GradedAlgebra.liftι A M x) = x
-    rw [ExteriorAlgebra.GradedAlgebra.liftι_eq]
-    simpa only [DirectSum.lof_eq_of] using
-      (DirectSum.component.lof_self A (M := fun k : ℕ ↦ ⋀[A]^k M) n x)
-  have hsplitS : (retract.baseChange S).comp ((⋀[A]^n M).subtype.baseChange S) =
-      LinearMap.id := by
-    rw [← LinearMap.baseChange_comp, hsplit, LinearMap.baseChange_id]
-  let rangeEquiv : (S ⊗[A] (⋀[A]^n M)) ≃ₗ[S] (⋀[A]^n M).baseChange S :=
-    LinearEquiv.ofLeftInverse
-      (f := (⋀[A]^n M).subtype.baseChange S) (g := retract.baseChange S)
-      (fun x ↦ DFunLike.congr_fun hsplitS x)
-  let e := (ExteriorAlgebra.equivBaseChange (R := A) (S := S) (M := M)).toLinearEquiv
-  -- The exterior-algebra comparison identifies the image of each fixed degree.
-  let imageEquiv : (⋀[S]^n (S ⊗[A] M)) ≃ₗ[S] (⋀[A]^n M).baseChange S :=
-    (Submodule.equivMapOfInjective e.toLinearMap e.injective _).trans
-      (LinearEquiv.ofEq _ _
-        (ExteriorAlgebra.equivBaseChange_map_exteriorPower (R := A) (S := S) (M := M) n))
   let carrierEquiv : (S ⊗[A] (⋀[A]^n M)) ≃ₗ[S] (⋀[S]^n (S ⊗[A] M)) :=
-    rangeEquiv.trans imageEquiv.symm
+    (TauCeti.exteriorPower.equivBaseChange S n).symm
   exact ⟨determinantEquiv.trans (carrierEquiv.trans (exteriorPowerCongr n moduleEquiv))⟩
 
 /-- Scalar extension supported on one rank fiber may be compared with any
@@ -928,8 +904,8 @@ theorem determinantLine_prod (Q : Type w) [AddCommGroup Q] [Module R Q]
           (DeterminantLine R P) (DeterminantLine R Q) ≪≫ₗ
         TensorProduct.congr eP eQ ≪≫ₗ
         LinearEquiv.ofBijective
-          (exteriorPower.prodPairing (S t) (S t ⊗[R] P) (S t ⊗[R] Q) n m)
-          (exteriorPower.bijective_prodPairing_of_rankAtStalk_eq
+          (TauCeti.exteriorPower.wedgeTensor (S t) (S t ⊗[R] P) (S t ⊗[R] Q) n m (n + m) rfl)
+          (exteriorPower.bijective_wedgeTensor_of_rankAtStalk_eq
             (S t) (S t ⊗[R] P) (S t ⊗[R] Q) n m (hP_rank t) (hQ_rank t)) ≪≫ₗ
         eTop ≪≫ₗ eDegree ≪≫ₗ ePQ.symm⟩
   exact ⟨sourceEquiv ≪≫ₗ

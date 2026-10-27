@@ -7,7 +7,7 @@ module
 public import ProjectiveModules.ExteriorPower.Projective
 public import ProjectiveModules.Invertible.OfRankOne
 import Mathlib.RingTheory.Flat.Localization
-import ProjectiveModules.ExteriorPower.BaseChange
+import TauCeti.LinearAlgebra.ExteriorPower.BaseChange
 
 /-!
 # Invertibility of top exterior powers
@@ -41,15 +41,8 @@ theorem invertible_of_rankAtStalk_eq
   -- Flatness here is supplied by localization, not imposed on the theorem.
   have : Module.Flat R A := IsLocalization.flat A p.asIdeal.primeCompl
   have : Module.Free A (A ⊗[R] M) := Module.free_of_flat_of_isLocalRing
-  let e := (ExteriorAlgebra.equivBaseChange (R := R) (S := A) (M := M)).toLinearEquiv
-  -- First identify the image submodule; this alone is not a carrier equivalence.
-  let ep : (⋀[A]^n (A ⊗[R] M)) ≃ₗ[A] (⋀[R]^n M).baseChange A :=
-    (Submodule.equivMapOfInjective e.toLinearMap e.injective _).trans
-      (LinearEquiv.ofEq _ _
-        (ExteriorAlgebra.equivBaseChange_map_exteriorPower (R := R) (S := A) (M := M) n))
-  -- The actual tensor-to-range equivalence uses the proved flatness of A over R.
   let eE : (A ⊗[R] (⋀[R]^n M)) ≃ₗ[A] (⋀[A]^n (A ⊗[R] M)) :=
-    (Submodule.toBaseChange.toLinearEquiv A (⋀[R]^n M)).trans ep.symm
+    (TauCeti.exteriorPower.equivBaseChange A n).symm
   have hM : Module.finrank A (A ⊗[R] M) = n := by
     rw [← (LocalizedModule.equivTensorProduct p.asIdeal.primeCompl M).finrank_eq]
     exact congrFun h p

@@ -21,6 +21,8 @@ is Ring-only and also specializes to quotients by two-sided ideals.
 
 @[expose] public section
 
+open TauCeti
+
 universe uR uS uι
 
 namespace Module
@@ -119,10 +121,10 @@ theorem rightFreeFrom_rightFreeTo (z : Obj f (ι → R)) :
     _ = tmul f
         (∑ i, MulOpposite.op (x i) • (Pi.single i (1 : R) : ι → R)) s := by
           induction (Finset.univ : Finset ι) using Finset.induction_on with
-          | empty => simp [tmul, BalancedTensorProduct.zero_tmul]
+          | empty => simp [tmul, BalancedTensorProduct.zero_tmul ℤ _]
           | @insert i t hi ih =>
               rw [Finset.sum_insert hi, Finset.sum_insert hi, ih]
-              exact (BalancedTensorProduct.add_tmul _ _ _).symm
+              exact (BalancedTensorProduct.add_tmul ℤ _ _ _ _).symm
     _ = tmul f x s := by
           congr 1
           ext j

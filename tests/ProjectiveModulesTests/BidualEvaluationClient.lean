@@ -36,21 +36,21 @@ example :
       (LinearMap.id : ℕ →ₗ[ℕ] ℕ) = 2 := rfl
 
 example :
-    LinearMap.bidualEvalEquiv ℕ ℕ 1 (LinearMap.id : ℕ →ₗ[ℕ] ℕ) = 1 := by
-  simp only [LinearMap.bidualEvalEquiv_apply, LinearMap.id_apply]
+    TauCeti.opDualEvalEquiv ℕ ℕ 1 (LinearMap.id : ℕ →ₗ[ℕ] ℕ) = 1 := by
+  simp only [TauCeti.opDualEvalEquiv_apply, LinearMap.id_apply]
 
 example :
-    LinearMap.bidualEvalEquiv ℕ (Fin 2 → ℕ) (Pi.single 0 1)
+    TauCeti.opDualEvalEquiv ℕ (Fin 2 → ℕ) (Pi.single 0 1)
       (LinearMap.proj 0) = 1 := by
   simp
 
 example (Φ : (ℕ →ₗ[ℕ] ℕ) →ₗ[ℕᵐᵒᵖ] ℕ) :
-    (LinearMap.id : ℕ →ₗ[ℕ] ℕ) ((LinearMap.bidualEvalEquiv ℕ ℕ).symm Φ) =
+    (LinearMap.id : ℕ →ₗ[ℕ] ℕ) ((TauCeti.opDualEvalEquiv ℕ ℕ).symm Φ) =
       Φ (LinearMap.id : ℕ →ₗ[ℕ] ℕ) :=
-  LinearMap.apply_bidualEvalEquiv_symm ℕ ℕ Φ LinearMap.id
+  TauCeti.apply_opDualEvalEquiv_symm ℕ ℕ Φ LinearMap.id
 
 noncomputable example : (Fin 0 → ℕ) ≃ₗ[ℕ]
     (((Fin 0 → ℕ) →ₗ[ℕ] ℕ) →ₗ[ℕᵐᵒᵖ] ℕ) :=
-  LinearMap.bidualEvalEquiv ℕ (Fin 0 → ℕ)
+  TauCeti.opDualEvalEquiv ℕ (Fin 0 → ℕ)
 
 end ProjectiveModulesTests.BidualEvaluationClient

@@ -38,12 +38,12 @@ example (R : Type u) [Ring R] (X : FiniteProjective.{u, v} R) :
   ⟨((equivSmallModel.{u} (FiniteProjective.{u, v} R)).unitIso.app X).symm⟩
 
 -- The regular right module is present in the reference category, and a larger
--- input carrier yields the same class in that one reference skeleton.
+-- input carrier yields the same class in that one reference category.
 example (R : Type u) [Ring R] :
-    FiniteProjective.isoClass Rᵐᵒᵖ (ULift.{v} Rᵐᵒᵖ) =
-      toSkeleton (FiniteProjective.of Rᵐᵒᵖ Rᵐᵒᵖ) := by
-  rw [FiniteProjective.isoClass_ulift]
-  exact FiniteProjective.isoClass_of Rᵐᵒᵖ (FiniteProjective.of Rᵐᵒᵖ Rᵐᵒᵖ)
+    TauCeti.objectCode (FiniteProjective.repr Rᵐᵒᵖ (ULift.{v} Rᵐᵒᵖ)) =
+      TauCeti.objectCode (FiniteProjective.of Rᵐᵒᵖ Rᵐᵒᵖ) := by
+  rw [FiniteProjective.objectCode_repr_ulift]
+  exact FiniteProjective.objectCode_repr Rᵐᵒᵖ (FiniteProjective.of Rᵐᵒᵖ Rᵐᵒᵖ)
 
 -- Evaluation through the lift comparison recovers the represented element.
 example (R : Type u) [Ring R] (x : R) :
@@ -54,35 +54,37 @@ example (R : Type u) [Ring R] (x : R) :
   simp only [FiniteProjective.reprULiftIso_hom_apply, LinearEquiv.apply_symm_apply]
 
 example (R : Type u) [Ring R] :
-    FiniteProjective.isoClass Rᵐᵒᵖ (ULift.{v} PUnit.{1}) =
-      toSkeleton (FiniteProjective.of Rᵐᵒᵖ PUnit.{u + 1}) :=
-  FiniteProjective.isoClass_zero Rᵐᵒᵖ (ULift.{v} PUnit.{1})
+    TauCeti.objectCode (FiniteProjective.repr Rᵐᵒᵖ (ULift.{v} PUnit.{1})) =
+      TauCeti.objectCode (FiniteProjective.of Rᵐᵒᵖ PUnit.{u + 1}) :=
+  FiniteProjective.objectCode_repr_zero Rᵐᵒᵖ (ULift.{v} PUnit.{1})
 
 -- All finite projective right modules collapse to one class over the zero
 -- ring; no module-rank calculation is used.
 example (R : Type u) [Ring R] [Subsingleton R]
     (X : FiniteProjective.{u, v} Rᵐᵒᵖ) (Y : FiniteProjective.{u, w} Rᵐᵒᵖ) :
-    FiniteProjective.isoClass Rᵐᵒᵖ X = FiniteProjective.isoClass Rᵐᵒᵖ Y := by
+    TauCeti.objectCode (FiniteProjective.repr Rᵐᵒᵖ X) =
+      TauCeti.objectCode (FiniteProjective.repr Rᵐᵒᵖ Y) := by
   let : Subsingleton X := Module.subsingleton Rᵐᵒᵖ X
   let : Subsingleton Y := Module.subsingleton Rᵐᵒᵖ Y
-  exact (FiniteProjective.isoClass_eq_iff Rᵐᵒᵖ X Y).2
+  exact (FiniteProjective.objectCode_repr_eq_iff Rᵐᵒᵖ X Y).2
     ⟨LinearEquiv.ofSubsingleton X Y⟩
 
 example (n m : ℕ) :
-    FiniteProjective.isoClass PUnit.{1} (Fin n → PUnit.{1}) =
-      FiniteProjective.isoClass PUnit.{1} (Fin m → PUnit.{1}) :=
-  (FiniteProjective.isoClass_eq_iff PUnit.{1} _ _).2
+    TauCeti.objectCode (FiniteProjective.repr PUnit.{1} (Fin n → PUnit.{1})) =
+      TauCeti.objectCode (FiniteProjective.repr PUnit.{1} (Fin m → PUnit.{1})) :=
+  (FiniteProjective.objectCode_repr_eq_iff PUnit.{1} _ _).2
     ⟨LinearEquiv.ofSubsingleton _ _⟩
 
 /-- Two finite-dimensional right vector spaces over a division ring have the
-same class in the ring-universe reference skeleton exactly when their finite
+same class in the ring-universe reference category exactly when their finite
 dimensions agree, even for independent carrier universes. -/
-theorem isoClass_eq_iff_finrank_eq (K : Type u) [DivisionRing K]
+theorem objectCode_repr_eq_iff_finrank_eq (K : Type u) [DivisionRing K]
     (M : Type v) [AddCommGroup M] [Module Kᵐᵒᵖ M] [Module.Finite Kᵐᵒᵖ M]
     (N : Type w) [AddCommGroup N] [Module Kᵐᵒᵖ N] [Module.Finite Kᵐᵒᵖ N] :
-    FiniteProjective.isoClass Kᵐᵒᵖ M = FiniteProjective.isoClass Kᵐᵒᵖ N ↔
+    TauCeti.objectCode (FiniteProjective.repr Kᵐᵒᵖ M) =
+      TauCeti.objectCode (FiniteProjective.repr Kᵐᵒᵖ N) ↔
       Module.finrank Kᵐᵒᵖ M = Module.finrank Kᵐᵒᵖ N := by
-  rw [FiniteProjective.isoClass_eq_iff]
+  rw [FiniteProjective.objectCode_repr_eq_iff]
   constructor
   · rintro ⟨e⟩
     exact e.finrank_eq
@@ -97,14 +99,14 @@ theorem isoClass_eq_iff_finrank_eq (K : Type u) [DivisionRing K]
       (e.toLinearEquiv.trans (Module.Finite.reprEquiv Kᵐᵒᵖ N))⟩
 
 private theorem rightFreeClasses (K : Type u) [DivisionRing K] (n m : ℕ) :
-    FiniteProjective.isoClass Kᵐᵒᵖ (Fin n → Kᵐᵒᵖ) =
-      FiniteProjective.isoClass Kᵐᵒᵖ (Fin m → Kᵐᵒᵖ) ↔ n = m := by
-  rw [isoClass_eq_iff_finrank_eq]
+    TauCeti.objectCode (FiniteProjective.repr Kᵐᵒᵖ (Fin n → Kᵐᵒᵖ)) =
+      TauCeti.objectCode (FiniteProjective.repr Kᵐᵒᵖ (Fin m → Kᵐᵒᵖ)) ↔ n = m := by
+  rw [objectCode_repr_eq_iff_finrank_eq]
   simp only [Module.finrank_fin_fun]
 
 example (K : Type u) [DivisionRing K] :
-    FiniteProjective.isoClass Kᵐᵒᵖ (Fin 1 → Kᵐᵒᵖ) ≠
-      FiniteProjective.isoClass Kᵐᵒᵖ (Fin 0 → Kᵐᵒᵖ) := by
+    TauCeti.objectCode (FiniteProjective.repr Kᵐᵒᵖ (Fin 1 → Kᵐᵒᵖ)) ≠
+      TauCeti.objectCode (FiniteProjective.repr Kᵐᵒᵖ (Fin 0 → Kᵐᵒᵖ)) := by
   intro h
   have hn := (rightFreeClasses K 1 0).1 h
   simp at hn

@@ -40,9 +40,10 @@ See [credits](CREDITS.md) for mathematical contributions and expression origins.
   [`Module.CountablyGenerated.submodule_of_isNoetherianRing`](../ProjectiveModules/Module/CountablyGenerated/Noetherian.lean)
   and the [proof and example guide](NoetherianSubmodule.md).
 - **Freeness over a commutative PID:**
-  [`Submodule.free_of_pid_of_free` and `Module.Projective.free_of_pid`](../ProjectiveModules/Module/PID.lean)
+  [`Submodule.free_of_isPrincipalIdealRing` and `Module.Free.of_injective_of_projective_of_isPrincipalIdealRing`](https://github.com/TauCetiProject/TauCeti/blob/906780592fedf73008c25d5b4c16ae2321fc836d/TauCeti/LinearAlgebra/FreeModule/PID.lean)
   cover arbitrary-rank free ambient modules and arbitrary-rank projectives,
-  respectively. They do not turn the preceding general Noetherian theorem into
+  respectively; for a projective module apply the injective-map theorem to its
+  identity. They do not turn the preceding general Noetherian theorem into
   a freeness statement.
 ### Idempotents and principal right ideals
 
@@ -67,12 +68,13 @@ See [credits](CREDITS.md) for mathematical contributions and expression origins.
   extension are bundled as finite projectives over arbitrary rings.
 ### Exterior constructions
 
-- **Exterior constructions:** The [full exterior algebra](../ProjectiveModules/ExteriorAlgebra/BaseChange.lean)
+- **Exterior constructions:** The [full exterior algebra](https://github.com/leanprover-community/mathlib4/blob/2cabef97b63d3275776b8b060d802de6a6fa1055/Mathlib/LinearAlgebra/ExteriorAlgebra/BaseChange.lean)
   commutes with arbitrary scalar extension; separately, the
   [fixed-degree binary Sum Formula](../ProjectiveModules/ExteriorPower/DirectSum.lean)
   decomposes an exterior power of a direct sum into complementary-degree
-  tensor products and is natural for module maps over the fixed ring. Neither
-  supplies a fixed-degree scalar-extension theorem. The library also proves
+  tensor products and is natural for module maps over the fixed ring. Tau Ceti
+  separately supplies `TauCeti.exteriorPower.equivBaseChange` for fixed-degree
+  carriers over arbitrary coefficient algebras, without flatness. The library also proves
   [projectivity of exterior powers](../ProjectiveModules/ExteriorPower/Projective.lean)
   and constructs [determinants](../ProjectiveModules/ExteriorPower/Determinant.lean).
 - **[Exterior vanishing](../ProjectiveModules/ExteriorPower/StalkRank.lean):**
@@ -147,7 +149,7 @@ a Picard- or K-theoretic map.
 - **Ordinary-coefficient bidual evaluation:** For a possibly noncommutative
   semiring `R` and a finitely generated projective left `R`-module `M` whose
   addition is a commutative monoid,
-  [`LinearMap.bidualEvalEquiv R M`](../ProjectiveModules/Module/Bidual.lean) gives
+  [`TauCeti.opDualEvalEquiv R M`](../ProjectiveModules/Module/Bidual.lean) gives
   `M ≃ₗ[R] ((M →ₗ[R] R) →ₗ[Rᵐᵒᵖ] R)`. Its forward map is `LinearMap.flip`
   of the identity, sending `m` to `f ↦ f m`. The ordinary coefficient `R`
   has its canonical regular actions: the first Hom is an `Rᵐᵒᵖ`-module by
@@ -267,7 +269,7 @@ a Picard- or K-theoretic map.
   reflects finite projectivity when both carriers are at the corresponding
   maxima. There is no linearity, commutativity or freeness premise.
 - **Projectivity under scalar restriction:** Over semirings `R` and `S`,
-  [`Module.Projective.trans`](../ProjectiveModules/Module/ScalarRestriction.lean)
+  [`Module.Projective.trans`](https://github.com/TauCetiProject/TauCeti/blob/906780592fedf73008c25d5b4c16ae2321fc836d/TauCeti/Algebra/Module/Projective/Trans.lean)
   makes any projective `S`-module `M` projective over `R` when `S` is
   projective over `R` and both scalar towers `R`–`S`–`S` and `R`–`S`–`M`
   hold for the given actions. No finite-generation assumption on `M` is needed.
@@ -353,8 +355,8 @@ a Picard- or K-theoretic map.
   representatives, class descent and group completion; no equivalence of whole
   module categories, commutativity, nontriviality, freeness, rank, cancellation
   or `Small` premise is required. Separately, the
-  [coefficient comparison](../ProjectiveModules/Module/RightDual.lean)
-  `LinearEquiv.rightDualOpposite` sends `f` to `op ∘ f` over any semiring
+  [coefficient comparison](https://github.com/TauCetiProject/TauCeti/blob/906780592fedf73008c25d5b4c16ae2321fc836d/TauCeti/LinearAlgebra/Dual/Opposite.lean)
+  `TauCeti.opDualCodomainEquiv` sends `f` to `op ∘ f` over any semiring
   and additive-commutative-monoid right module, without finite generation or
   projectivity; it is semilinear along the double-opposite isomorphism.
 - **Morita invariance of right classes and K₀:** For arbitrary rings
@@ -724,7 +726,7 @@ The kernel interface constructs neither a basis nor a linear equivalence
 onto the kernel.
 
 Right modules use opposite-ring actions where needed: the
-[balanced tensor](../ProjectiveModules/Module/BalancedTensorProduct.lean) and
+[balanced tensor](../ProjectiveModules/Module/BalancedTensorAdditive.lean) and
 [right extension](../ProjectiveModules/Module/RightExtension.lean) preserve
 noncommutative multiplication order. Extension/restriction, quotient and
 finite free-coordinate equivalences do not assume commutativity. Tensoring
@@ -820,11 +822,12 @@ of the latter ideal is not fixed by the idempotent action. These are
 scalar-extension computations of modules, not assertions that their K₀
 generators are distinct.
 
-The direct-sum monoid `KTheory.ProjectiveClass R` is a ring-universe resizing
-of isomorphism classes in the complete finite-projective right-module reference
+The direct-sum monoid `KTheory.ProjectiveClass R` uses Tau Ceti's `ObjectCode`
+of isomorphism classes in the finite-projective right-module reference
 category. Its generators respect zero modules, products, linear equivalences,
 representatives and carrier lifts. `KTheory.K0 R` is Mathlib's additive
-Grothendieck group of that monoid, not a quotient that assumes projective-module
+Grothendieck group of that monoid, compared to Tau Ceti `SplitK0` by
+`K0.splitK0Equiv`, not a quotient that assumes projective-module
 cancellation. The [common-stabilization clients](../tests/ProjectiveModulesTests/K0FiniteStabilizationClient.lean)
 include explicitly nonfree finite projective ideals over `ℚ × ℚ`, products and
 independent carrier lifts, and zero rings. Nonfreeness alone does not detect

@@ -146,21 +146,23 @@ sources:
       bibliography is not the provenance of individual Lean expressions.
 
 related_formalizations:
-  - id: "https://github.com/leanprover-community/mathlib4/tree/83abb3e776bdefcbc447a1e44d0debe4010039e5"
+  - id: "https://github.com/leanprover-community/mathlib4/tree/2cabef97b63d3275776b8b060d802de6a6fa1055"
     relationship: "builds-on"
-    note: "Mathlib mathematics and categories; the Projective root resolves this exact mathlib revision."
+    note: "Mathlib mathematics and categories; the root resolves this revision with Lean 4.36.0-rc1."
+  - id: "https://github.com/TauCetiProject/TauCeti/tree/906780592fedf73008c25d5b4c16ae2321fc836d"
+    relationship: "builds-on"
+    note: "Canonical balanced tensors, stable quotient, finite-projective object codes, dual/exterior and module APIs."
   - id: "https://github.com/FormalFrontier/general-linear-groups/tree/c9705889a85f85cc89d92d21372bb9bc360162c8"
     relationship: "builds-on"
     note: >-
       Quasi-regular ideals and matrix-quotient unit reflection. GLG and this
-      root both declare mathlib 83abb3e776bdefcbc447a1e44d0debe4010039e5.
-  - id: "https://github.com/FormalFrontier/stable-range/tree/71625754592cadb5330b3452d626dc659405da65"
+      root resolve the root-pinned Mathlib environment; GLG retains its older declaration.
+  - id: "https://github.com/FormalFrontier/stable-range/tree/c283b01ed9ebc33c7eefcdb4f3d2ca45141f469e"
     relationship: "builds-on"
     note: >-
       Stable-range/cancellation prerequisites for the finite stably-free
       semisimple result, and the local Jacobson-radical characterization.
-      Stable Range and this root both declare mathlib
-      83abb3e776bdefcbc447a1e44d0debe4010039e5.
+      Stable Range is built against the root-pinned Mathlib environment; its own declaration is older.
   - id: "docs/CREDITS.md"
     relationship: "other"
     note: >-
@@ -217,7 +219,8 @@ status:
     inputs from different carrier universes. These size interfaces alone do
     not construct a K₀ group. Separate KTheory modules resize the direct-sum
     class monoid and form its additive Grothendieck group, both in Type u.
-    They provide descent, evaluation, extensionality and uniqueness laws,
+    Tau Ceti ObjectCode supplies the canonical class monoid; Mathlib completion
+    is compared with Tau Ceti SplitK0. They provide descent, evaluation, extensionality and uniqueness laws,
     difference representatives and common stabilization criteria. A common
     finite projective stabilizer may be replaced by Fin n → Rᵐᵒᵖ, with
     existential n and no IBN or projective-module cancellation premise.
@@ -394,8 +397,8 @@ status:
     - declaration: "IsBaseChange.contractBaseChangeEquivOfProjective"
       file: "ProjectiveModules/Contraction/BaseChange.lean"
       note: "Evaluation/contraction compatibility for finite projectives over commutative rings."
-    - declaration: "ExteriorAlgebra.equivBaseChange"
-      file: "ProjectiveModules/ExteriorAlgebra/BaseChange.lean"
+    - declaration: "ExteriorAlgebra.baseChangeEquiv"
+      file: "https://github.com/leanprover-community/mathlib4/blob/2cabef97b63d3275776b8b060d802de6a6fa1055/Mathlib/LinearAlgebra/ExteriorAlgebra/BaseChange.lean"
       note: >-
         Full exterior-algebra base change over arbitrary commutative rings and
         modules; no finite, projective, flat or invertible-two assumption.
@@ -589,8 +592,8 @@ status:
     - declaration: "ModuleCat.FiniteProjective"
       file: "ProjectiveModules/Category/FiniteProjective.lean"
       note: "Finite projective modules as a full additive subcategory with finite biproducts over arbitrary rings."
-    - declaration: "ModuleCat.finite_iff_of_equivalence"
-      file: "ProjectiveModules/Category/ModuleEquivalence.lean"
+    - declaration: "CategoryTheory.Equivalence.finite_functor_obj_iff"
+      file: "https://github.com/TauCetiProject/TauCeti/blob/906780592fedf73008c25d5b4c16ae2321fc836d/TauCeti/Algebra/Category/ModuleCat/Equivalence.lean"
       note: >-
         A given ModuleCat.{vR} R ≌ ModuleCat.{vS} S preserves and reflects
         Module.Finite over arbitrary rings, with independent scalar universes
@@ -608,10 +611,10 @@ status:
         and reflects the canonical finite-projective object property, with
         no linearity, commutativity or freeness assumption.
     - declaration: "OrderIso.isCompactElement"
-      file: "ProjectiveModules/Order/CompactlyGenerated.lean"
+      file: "https://github.com/TauCetiProject/TauCeti/blob/906780592fedf73008c25d5b4c16ae2321fc836d/TauCeti/Order/CompactlyGenerated.lean"
       note: "Order isomorphisms map compact elements to compact elements in arbitrary partial orders."
     - declaration: "OrderIso.isCompactElement_iff"
-      file: "ProjectiveModules/Order/CompactlyGenerated.lean"
+      file: "https://github.com/TauCetiProject/TauCeti/blob/906780592fedf73008c25d5b4c16ae2321fc836d/TauCeti/Order/CompactlyGenerated.lean"
       note: "Compact-element preservation and reflection at independent universes, without completeness or a top element."
     - declaration: "ModuleCat.finiteProjectiveEssentiallySmall"
       file: "ProjectiveModules/Category/FiniteProjectiveSmallness.lean"
@@ -669,8 +672,9 @@ status:
     - declaration: "KTheory.K0"
       file: "ProjectiveModules/KTheory/K0.lean"
       note: >-
-        Mathlib's additive Grothendieck group of the projective class monoid,
-        in the ring universe, for arbitrary rings including the zero ring.
+        Mathlib's additive Grothendieck group of Tau Ceti ObjectCode of finite
+        projective right modules, in the ring universe, for arbitrary rings
+        including the zero ring; K0.splitK0Equiv compares the canonical SplitK0.
         For arbitrary rings, generator equality means common stabilization,
         not necessarily module isomorphism.
     - declaration: "KTheory.K0.lift"
@@ -802,17 +806,17 @@ status:
         The entire K₀ group of a subsingleton ring is a subsingleton, as is
         the direct-sum class monoid. Generator normalization does not use the
         nonadditive zero-ring convention for module finrank.
-    - declaration: "ModuleCat.Stable.quotient_map_eq_iff"
-      file: "ProjectiveModules/Category/Stable.lean"
-      note: "Stable equality is factorization of the difference through a projective; the quotient is preadditive."
-    - declaration: "ModuleCat.FactorsThroughProjective.iff_ext_one_precomp_eq_zero"
+    - declaration: "TauCeti.ExactStructure.projectiveStableFunctor_map_eq_zero_iff"
+      file: "https://github.com/TauCetiProject/TauCeti/blob/906780592fedf73008c25d5b4c16ae2321fc836d/TauCeti/CategoryTheory/Exact/Stable/Basic.lean"
+      note: "The canonical stable quotient kills exactly maps factoring through projectives; it is preadditive."
+    - declaration: "ModuleCat.projectiveFactorsThrough_iff_ext_one_precomp_eq_zero"
       file: "ProjectiveModules/Category/Stable.lean"
       note: >-
         Detect projective factorization by all Ext-one precomposition maps;
         retains the Small.{uM} R universe hypothesis. No abelian stable-category
         structure, completed-group-ring duality or transpose theory is asserted.
-    - declaration: "BalancedTensorProduct.lift"
-      file: "ProjectiveModules/Module/BalancedTensorProduct.lean"
+    - declaration: "TauCeti.BalancedTensorProduct.liftAddHom"
+      file: "ProjectiveModules/Module/BalancedTensorAdditive.lean"
       note: "Universal additive balanced map for a right and a left module over an arbitrary ring."
     - declaration: "Module.Projective.balancedTensor_short_exact"
       file: "ProjectiveModules/Module/BalancedTensorExact.lean"
@@ -1257,8 +1261,8 @@ status:
     - declaration: "Module.Projective.free_of_isUnit_compl_arbitraryRank"
       file: "ProjectiveModules/Module/ArbitraryLocalProjectiveFree.lean"
       note: "Arbitrary-rank projective right-module freeness under the proper-ideal/unit-complement hypotheses."
-    - declaration: "Module.Projective.free_of_pid"
-      file: "ProjectiveModules/Module/PID.lean"
+    - declaration: "Module.Free.of_injective_of_projective_of_isPrincipalIdealRing"
+      file: "https://github.com/TauCetiProject/TauCeti/blob/906780592fedf73008c25d5b4c16ae2321fc836d/TauCeti/LinearAlgebra/FreeModule/PID.lean"
       note: "Every projective over a commutative PID is free, using arbitrary-rank free-submodule freeness."
     - declaration: "LaurentPolynomial.module_free_of_finite_projective"
       file: "ProjectiveModules/Module/LaurentPolynomial.lean"
@@ -1391,7 +1395,8 @@ fidelity:
   divergences: >-
     Right modules use opposite-ring actions; balanced tensor respects
     noncommutative order and semiring Hom exactness is additive. Full exterior
-    algebra base change is not fixed-degree scalar extension; the binary Sum
+    algebra base change and fixed-degree scalar extension are distinct APIs;
+    Mathlib supplies the former and Tau Ceti supplies the latter. The binary Sum
     Formula is separate. Over arbitrary rings, rank does not classify all finite
     projectives; the commutative stalk-rank classification concerns the
     componentwise-free finite projectives. The stable category is preadditive, not
@@ -1432,7 +1437,7 @@ review:
     complete-book formalization is claimed.
 
 acknowledgements: >-
-  Mathlib, General Linear Groups and Stable Range supply declared dependencies;
+  Mathlib, Tau Ceti, General Linear Groups and Stable Range supply declared dependencies;
   their authorship and license notices remain upstream. Lean and Lake supply
   the proof assistant and build system. Charles A. Weibel is the cited book
   author, separately from project formalization authors. Project contributions
@@ -1442,14 +1447,14 @@ acknowledgements: >-
   general kernel interfaces also use Mathlib's stably-free and matrix APIs and
   Formal Frontier's finite stable presentation and projective splitting
   formalization. Right-extension comparisons and their pointwise unit and
-  associativity laws use the balanced-tensor/right-extension formalization
-  contributed and maintained by Formal Frontier, the comparison
+  associativity laws use Tau Ceti's canonical balanced tensor and outer actions,
+  Formal Frontier's retained right-extension formalization, the comparison
   interfaces contributed by Formal Frontier, and Mathlib's ring-homomorphism and
   linear-map interfaces. Projective-class descent and stabilization follow
   the object-class and group-completion approach in Formal Frontier's Algebraic
   Direct Limits formalization without depending on that library. The K₀
-  construction reuses Mathlib's skeleton, resizing, monoidal, additive
-  Grothendieck group, localization and dimension APIs.
+  construction uses Tau Ceti ObjectCode and SplitK0, and reuses Mathlib's
+  additive Grothendieck group, localization and dimension APIs.
   The commutative-base tensor comparisons contributed by Formal Frontier reuse
   Mathlib's tensor universal property, commutation, tensor maps and module
   transport; the scalar-first target follows Jujian Zhang's Mathlib

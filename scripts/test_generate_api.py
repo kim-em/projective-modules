@@ -3,8 +3,10 @@
 # Authors: Formal Frontier Agents
 """Synthetic adapter and refusal controls, not native records or Lean evidence.
 
-Optional historical reproduction needs private original source, records and
-SQLite; --check cannot match the source-amended release documentation.
+The archived display supplies signatures for synthetic native-record fixtures.
+Source fixtures contain only synthetic lines, sufficient for range/refusal tests;
+they are not original Lean source or native provenance. Historical reproduction
+needs the unavailable original source, native records and SQLite.
 """
 
 import copy
@@ -22,6 +24,17 @@ import generate_api as api
 
 
 ROOT = Path(__file__).resolve().parent.parent
+# Three split-kernel displays were edited after the historical native run.
+# Exercise these authored signatures as synthetic records; leave the shipped
+# native inventory unchanged and make no claim to reconstruct its missing data.
+api.EXPECTED = copy.deepcopy(api.EXPECTED)
+SYNTHETIC_DISPLAY_OVERRIDES = {'LinearMap.splitKernelProjection': {'header_sha256': '853a06519f55e4b3816b405fd088371ca627717b5e83633905b8f3c1c2b656a0'},
+ 'LinearMap.splitKernelProjection_comp_subtype': {'header_sha256': '826f414f6769dce38691a66bf4834816b9eb3d260ff5db1f72fb0b67f8f7dbbc'},
+ 'LinearMap.projective_splitKernel': {'header_sha256': '7d47cd62f89dc6f20606e6b3117ab325ec217960880ed62fab6b4d63593aaffc',
+                                      'doc_sha256': '76b17ac3caf7c4f1bd4d945c1740e4a5abe50458974a38ec46edc72890fd424c'}}
+for _name, _fields in SYNTHETIC_DISPLAY_OVERRIDES.items():
+    api.EXPECTED[_name].update(_fields)
+
 AMENDED_NAMES = ("Module.componentwiseFreeModel_finite",
                  "Module.componentwiseFreeModel_projective")
 AMENDMENT_NOTE = ("*Source-inspected amendment at `1762876`: `[Finite I]` replaces "
@@ -34,14 +47,26 @@ DOCSTRING_AMENDMENT_NOTE = (
 
 
 def fixture():
-    entries = re.findall(r"^### ([^\n]+)\n\n```lean\n([^\n]+)\n```\n\n(.*?)\n\n\[Source\]",
-                         (ROOT / "docs/API.md").read_text(), re.M | re.S)
+    entries = re.findall(r"^### ([^\n]+)\n\n```lean\n(.*?)\n```\n\n(.*?)\n\n\[Source\]",
+                         (ROOT / "docs/history/API.md").read_text(), re.M | re.S)
+    entries = [(name, " ".join(signature.split()), prose) for name, signature, prose in entries
+               if name in api.EXPECTED or name == "Submodule.PIDFree.instLinearOrder"]
+    entries = [(name.replace("Submodule.PIDFree.instLinearOrder",
+                             "Submodule.PIDFree.instLinearOrder_projectiveModules"),
+                signature.replace("Submodule.PIDFree.instLinearOrder",
+                                  "Submodule.PIDFree.instLinearOrder_projectiveModules"), prose)
+               for name, signature, prose in entries]
     api.require(len(entries) == 469 and len({name for name, _, _ in entries}) == 469,
                 "synthetic fixture signatures differ")
     records = {module: dict(name=module, imports=copy.deepcopy(meta["imports"]),
                             instances=copy.deepcopy(meta["instances"]), declarations=[])
                for module, meta in api.EXPECTED_MODULES.items()}
-    sources = {path: (ROOT / path).read_bytes() for path in api.INPUTS}
+    # The adapter checks source line bounds. These synthetic bytes deliberately
+    # make no claim to reproduce the unavailable historical source or pins.
+    sources = {path: b"-- synthetic source fixture\n" * max(
+        [1] + [entry["end_line"] for entry in api.EXPECTED.values()
+               if api.MODULE_PATHS[entry["module"]] == path])
+               for path in api.INPUTS}
     restored = set()
     for name, signature, prose in entries:
         api.require(name in api.EXPECTED, "synthetic fixture has unknown name")
@@ -71,6 +96,9 @@ def fixture():
         module = meta["module"]
         path = api.MODULE_PATHS[module]
         doc = "" if prose.startswith("*No source docstring is attached") else prose
+        # Later documentation supplied prose for historically undocumented sites.
+        if meta["doc_sha256"] == api.digest(b""):
+            doc = ""
         if name in AMENDED_NAMES or name == DOCSTRING_AMENDED_NAME:
             api.require(api.digest(api.Header(header).rendered().encode()) ==
                         meta["header_sha256"] and
@@ -104,7 +132,7 @@ class Controls(unittest.TestCase):
             self.assertEqual(api.digest(row["info"]["doc"].strip().encode()),
                              api.EXPECTED[name]["doc_sha256"])
         api.render(records, api.SOURCE, sources)
-        original = (ROOT / "docs/API.md").read_text()
+        original = (ROOT / "docs/history/API.md").read_text()
         self.assertEqual(original.count(AMENDMENT_NOTE), 2)
         finite_header = ("theorem Module.componentwiseFreeModel_finite "
                          "{R : Type u} [CommRing R] {I : Type u_1} [Finite I]")
@@ -127,7 +155,7 @@ class Controls(unittest.TestCase):
         self.assertEqual(api.digest(row["info"]["doc"].strip().encode()),
                          api.EXPECTED[DOCSTRING_AMENDED_NAME]["doc_sha256"])
         api.render(records, api.SOURCE, sources)
-        original = (ROOT / "docs/API.md").read_text()
+        original = (ROOT / "docs/history/API.md").read_text()
         self.assertEqual(original.count(DOCSTRING_AMENDMENT_NOTE), 1)
         for old, new in ((DOCSTRING_AMENDMENT_NOTE, ""),
                          (DOCSTRING_AMENDMENT_NOTE,
@@ -165,7 +193,8 @@ class Controls(unittest.TestCase):
         self.assertIn(b"not a raw/private/generated declaration census", markdown)
         self.assertIn(b"## PublicAPIClient\n\nScope: private regression client", markdown)
         self.assertIn(b"## ProjectiveModules\n\nScope: aggregate public-import root", markdown)
-        self.assertIn(b"../ProjectiveModules/Category/FiniteProjective.lean#L", markdown)
+        self.assertIn(("https://github.com/FormalFrontier/projective-modules/blob/" +
+                       api.SOURCE + "/ProjectiveModules/Category/FiniteProjective.lean#L").encode(), markdown)
         self.assertNotIn(b"../tests/ProjectiveModules.lean", markdown)
         self.assertFalse(manifest["proof_certification"])
         self.assertFalse(manifest["release_acceptance"])
@@ -310,23 +339,31 @@ class Controls(unittest.TestCase):
     def test_portable_parentless_fallback_and_stale_files(self):
         with tempfile.TemporaryDirectory(prefix="projective-api-portable-") as temporary:
             root = Path(temporary)
-            for path in api.INPUTS + api.DOCUMENTATION_INPUTS + (
-                "docs/API.md", "docs/api-manifest.json"):
+            records, synthetic_sources = fixture()
+            for path, content in synthetic_sources.items():
+                target = root / path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(content)
+            for path in api.DOCUMENTATION_INPUTS:
                 target = root / path
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(ROOT / path, target)
-            records, _ = fixture()
             native = root / "native"
             native.mkdir()
             for module, record in records.items():
                 (native / ("declaration-data-" + module + ".bmp")).write_text(
                     json.dumps(record, ensure_ascii=False))
             source_inputs = {path: (root / path).read_bytes() for path in api.INPUTS}
-            synthetic_api, synthetic_manifest = api.render(records, api.SOURCE, source_inputs)
+            inventory = copy.deepcopy(api.INVENTORY)
+            inventory["declarations"] = api.EXPECTED
+            (root / "scripts/api_inventory.json").write_text(json.dumps(inventory))
+            with mock.patch.object(api, "HERE", root / "scripts"):
+                synthetic_api, synthetic_manifest = api.render(records, api.SOURCE, source_inputs)
             (root / "docs/API.md").write_bytes(synthetic_api)
             (root / "docs/api-manifest.json").write_bytes(synthetic_manifest)
             command = ["python3", "-B", str(root / "scripts/generate_api.py"),
-                       "--native-data", str(native), "--source-revision", api.SOURCE]
+                       "--native-data", str(native), "--source-revision", api.SOURCE,
+                       "--output-directory", str(root / "docs")]
             def run(*extra):
                 return subprocess.run(command + list(extra), capture_output=True, text=True,
                                       cwd=root)

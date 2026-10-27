@@ -35,7 +35,7 @@ ring and is distinct from this zero-scalar-ring boundary.
 
 These comparisons use Projective Modules' tensor semiring, K₀, rank and
 zero-ring APIs; Mathlib's additive Grothendieck group; and the ring structure
-and generator in `GroupTheory.MonoidLocalization.GrothendieckGroup.Ring`.
+and generator in `TauCeti.RingTheory.GrothendieckRing`.
 -/
 
 universe uR uM uG
@@ -56,11 +56,12 @@ private noncomputable abbrev canonicalRing : CommRingStructure R :=
 /-- The inferred commutative ring is the Grothendieck ring of the tensor semiring. -/
 private theorem inferredRing_eq_generic :
     canonicalRing R =
-      Algebra.GrothendieckAddGroup.instCommRing (ProjectiveClass R) := rfl
+      Algebra.GrothendieckAddGroup.instCommRing (S := ProjectiveClass R) := rfl
 
 /-- The direct-sum monoid on projective classes. -/
 private noncomputable abbrev oldClassMonoid : AddCommMonoid (ProjectiveClass R) :=
-  KTheory.instAddCommMonoidProjectiveClass R
+  inferInstanceAs (AddCommMonoid
+    (TauCeti.ObjectCode (ModuleCat.FiniteProjective.{uR, uR} Rᵐᵒᵖ)))
 
 /-- The additive-completion group of the direct-sum monoid. -/
 private noncomputable abbrev oldCompletionGroup : AddCommGroup (K0 R) :=
@@ -102,22 +103,43 @@ private theorem additiveOperations_preserved :
 /-- Forgetting commutativity gives the Grothendieck ring structure. -/
 private theorem genericRing_projection :
     (canonicalRing R).toRing =
-      Algebra.GrothendieckAddGroup.instRing (ProjectiveClass R) := rfl
+      Algebra.GrothendieckAddGroup.instRing (S := ProjectiveClass R) := rfl
 
 /-- The ring generator has the same underlying additive map as the completion map. -/
 private theorem generator_eq_old :
     ((K0.ofClassRingHom R).toAddMonoidHom :
-      OldClassHom R) = oldOfClass R := rfl
+      OldClassHom R) = oldOfClass R :=
+  K0.ofClassRingHom_toAddMonoidHom R
 
-/-- Multiplication is the biadditive extension of tensor multiplication. -/
-private theorem multiplication_eq_generic :
-    (canonicalRing R).mul =
-      (fun x y : K0 R ↦ Algebra.GrothendieckAddGroup.mulAddHom x y) := rfl
+/-- The universal biadditive extension of tensor multiplication. -/
+private noncomputable def genericMultiplication : K0 R →+ K0 R →+ K0 R :=
+  K0.lift R
+    (((Algebra.GrothendieckAddGroup.liftAddEquiv
+      (M := ProjectiveClass R) (G := K0 R)).toAddMonoidHom.comp
+        (AddMonoidHom.compHom (K0.ofClass R))).comp AddMonoidHom.mul)
 
-/-- Bundled multiplication is the biadditive extension of tensor multiplication. -/
+/-- The whole bundled multiplication is the universal biadditive extension. -/
 private theorem bundledMultiplication_eq_generic :
-    (AddMonoidHom.mul : K0 R →+ K0 R →+ K0 R) =
-      Algebra.GrothendieckAddGroup.mulAddHom := rfl
+    (AddMonoidHom.mul : K0 R →+ K0 R →+ K0 R) = genericMultiplication R := by
+  apply K0.hom_ext_ofClass R
+  intro a
+  apply K0.hom_ext_ofClass R
+  intro b
+  change K0.ofClass R a * K0.ofClass R b = _
+  rw [genericMultiplication, K0.lift_ofClass]
+  change K0.ofClass R a * K0.ofClass R b =
+    Algebra.GrothendieckAddGroup.liftAddEquiv
+      ((K0.ofClass R).comp (AddMonoidHom.mulLeft a)) (K0.ofClass R b)
+  rw [Algebra.GrothendieckAddGroup.coe_liftAddEquiv,
+    Algebra.GrothendieckAddGroup.lift_apply_of]
+  exact Algebra.GrothendieckAddGroup.of_mul_of a b
+
+/-- The whole multiplication function agrees with its universal extension. -/
+private theorem multiplication_eq_generic :
+    (canonicalRing R).mul = (fun x y ↦ genericMultiplication R x y) := by
+  funext x y
+  exact congrArg (fun f : K0 R →+ K0 R →+ K0 R ↦ f x y)
+    (bundledMultiplication_eq_generic R)
 
 /-- The unit is the completion-map image of the regular right-module class. -/
 private theorem unit_eq_old_regular :
@@ -130,8 +152,12 @@ private theorem casts_eq_old_scaling :
           (oldOfClass R (ProjectiveClass.of R Rᵐᵒᵖ))) ∧
       (canonicalRing R).intCast =
         (fun z ↦ (oldCompletionGroup R).zsmul z
-          (oldOfClass R (ProjectiveClass.of R Rᵐᵒᵖ))) :=
-  ⟨rfl, rfl⟩
+          (oldOfClass R (ProjectiveClass.of R Rᵐᵒᵖ))) := by
+  constructor
+  · funext n
+    exact K0.natCast_eq_nsmul R n
+  · funext z
+    exact K0.intCast_eq_zsmul R z
 
 /-- The completion map evaluates on a projective class as the module generator. -/
 private theorem oldOfClass_of_module

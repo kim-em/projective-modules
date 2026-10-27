@@ -46,7 +46,7 @@ private theorem pid_projective_free (R : Type u) [CommRing R] [IsDomain R]
     IsPrincipalIdealRing.of_surjective (RingEquiv.toOpposite R).toRingHom
       (RingEquiv.toOpposite R).surjective
   intro X
-  exact Module.Projective.free_of_pid Rᵐᵒᵖ X
+  exact Module.Free.of_injective_of_projective_of_isPrincipalIdealRing (LinearMap.id : X →ₗ[Rᵐᵒᵖ] X) Function.injective_id
 
 -- Locality supplies canonical maximality and the unit-complement property.
 private theorem local_jacobson_properties (R : Type u) [Ring R] [IsLocalRing R] :

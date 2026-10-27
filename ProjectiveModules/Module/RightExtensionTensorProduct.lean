@@ -68,6 +68,8 @@ change-of-rings formalization. No alternative tensor quotient is constructed.
 
 @[expose] public section
 
+open TauCeti
+
 universe uR uS uM uN
 
 open CategoryTheory
@@ -470,7 +472,7 @@ noncomputable def tensorProductLinearEquiv (M : ModuleCat.{uM} Rᵐᵒᵖ) :
   let coefficientModule : @Module R S _ coefficientAdd.toAddCommMonoid :=
     ((ModuleCat.restrictScalars φ).obj (ModuleCat.of S S)).isModule
   let toTensor :
-      @BalancedTensorProduct.BalancedMap R M S _ sourceAdd coefficientAdd
+      @BalancedTensorProduct.BalancedAddMap R M S _ sourceAdd coefficientAdd
         sourceRightModule φ.toModule (tensorProductObj φ M)
         (tensorProductObj φ M).isAddCommGroup :=
     { toFun := tensorProductTmul φ M
@@ -480,32 +482,32 @@ noncomputable def tensorProductLinearEquiv (M : ModuleCat.{uM} Rᵐᵒᵖ) :
       map_add_right := tensorProductTmul_add_right φ M
       balance := tensorProductTmul_balance φ M }
   let forward : Obj φ M →+ tensorProductObj φ M :=
-    @BalancedTensorProduct.lift R M S _ sourceAdd coefficientAdd
+    @BalancedTensorProduct.liftAddHom R M S _ sourceAdd coefficientAdd
       sourceRightModule φ.toModule (tensorProductObj φ M)
       (tensorProductObj φ M).isAddCommGroup toTensor
   have forward_tmul (m : M) (s : S) :
       forward (tmul φ m s) = tensorProductTmul φ M m s :=
-    @BalancedTensorProduct.lift_tmul R M S _ sourceAdd coefficientAdd
+    @BalancedTensorProduct.liftAddHom_tmul R M S _ sourceAdd coefficientAdd
       sourceRightModule φ.toModule (tensorProductObj φ M)
       (tensorProductObj φ M).isAddCommGroup toTensor m s
   let toOld : M →+ S →+ Obj φ M :=
     { toFun := fun m ↦
         { toFun := tmul φ m
-          map_zero' := @BalancedTensorProduct.tmul_zero R M S _ sourceAdd coefficientAdd
-            sourceRightModule φ.toModule m
-          map_add' := @BalancedTensorProduct.tmul_add R M S _ sourceAdd coefficientAdd
-            sourceRightModule φ.toModule m }
+          map_zero' := @BalancedTensorProduct.tmul_zero ℤ R M S _ _ sourceAdd _ sourceRightModule
+            coefficientAdd _ φ.toModule m
+          map_add' := @BalancedTensorProduct.tmul_add ℤ R M S _ _ sourceAdd _ sourceRightModule
+            coefficientAdd _ φ.toModule m }
       map_zero' := by
         apply AddMonoidHom.ext
         intro s
-        exact @BalancedTensorProduct.zero_tmul R M S _ sourceAdd coefficientAdd
-          sourceRightModule φ.toModule s
+        exact @BalancedTensorProduct.zero_tmul ℤ R M S _ _ sourceAdd _ sourceRightModule
+          coefficientAdd _ φ.toModule s
       map_add' := by
         intro m n
         apply AddMonoidHom.ext
         intro s
-        exact @BalancedTensorProduct.add_tmul R M S _ sourceAdd coefficientAdd
-          sourceRightModule φ.toModule m n s }
+        exact @BalancedTensorProduct.add_tmul ℤ R M S _ _ sourceAdd _ sourceRightModule
+          coefficientAdd _ φ.toModule m n s }
   have balanced (r : R) (m : M) (s : S) :
       toOld (@SMul.smul R M sourceModule.toSMul r m) s =
         toOld m (@SMul.smul R S coefficientModule.toSMul r s) := by
@@ -534,7 +536,7 @@ noncomputable def tensorProductLinearEquiv (M : ModuleCat.{uM} Rᵐᵒᵖ) :
       sourceAdd.toAddCommMonoid coefficientAdd.toAddCommMonoid _
       sourceModule coefficientModule toOld balanced m s
   have leftHom : inverse.comp forward = AddMonoidHom.id (Obj φ M) := by
-    apply @BalancedTensorProduct.hom_ext R M S _ sourceAdd coefficientAdd
+    apply @BalancedTensorProduct.addHom_ext R M S _ sourceAdd coefficientAdd
       sourceRightModule φ.toModule (Obj φ M) _
     intro m s
     change inverse (forward (tmul φ m s)) = tmul φ m s
@@ -559,10 +561,10 @@ noncomputable def tensorProductLinearEquiv (M : ModuleCat.{uM} Rᵐᵒᵖ) :
       map_add' := forward.map_add
       map_smul' := by
         intro t x
-        induction x using @BalancedTensorProduct.induction_on R M S _ sourceAdd coefficientAdd
-          sourceRightModule φ.toModule with
-        | zero => rw [smul_zero, forward.map_zero, smul_zero]
-        | pure m s =>
+        induction x using
+          @BalancedTensorProduct.induction_on ℤ R M S _ _ sourceAdd _ sourceRightModule
+          coefficientAdd _ φ.toModule with
+        | ht m s =>
             have oldAction :
                 @SMul.smul Sᵐᵒᵖ (Obj φ M) extensionModule.toSMul t (tmul φ m s) =
                   tmul φ m (s * MulOpposite.unop t) :=
@@ -585,18 +587,15 @@ noncomputable def tensorProductLinearEquiv (M : ModuleCat.{uM} Rᵐᵒᵖ) :
                 congrArg
                   (@SMul.smul Sᵐᵒᵖ (tensorProductObj φ M) tensorModule.toSMul t)
                   (forward_tmul m s).symm
-        | neg x hx => rw [smul_neg, forward.map_neg, forward.map_neg, hx, smul_neg]
-        | add x y hx hy => rw [smul_add, forward.map_add, forward.map_add, hx, hy, smul_add] }
+        | ha x y hx hy => rw [smul_add, forward.map_add, forward.map_add, hx, hy, smul_add] }
 
 /-- The comparison retains the module-first pure tensor and its coefficient. -/
 theorem tensorProductLinearEquiv_tmul (M : ModuleCat.{uM} Rᵐᵒᵖ) (m : M) (s : S) :
     tensorProductLinearEquiv φ M (tmul φ m s) =
       tensorProductTmul φ M m s := by
-  let e : Obj φ M ≃ₗ[Sᵐᵒᵖ] tensorProductObj φ M := tensorProductLinearEquiv φ M
-  change e (tmul φ m s) = tensorProductTmul φ M m s
-  apply e.symm.injective
-  rw [e.symm_apply_apply, tensorProductTmul_eq_tmul]
-  rfl
+  let : Module R S := φ.toModule
+  change BalancedTensorProduct.liftAddHom _ (BalancedTensorProduct.tmul ℤ R m s) = _
+  exact BalancedTensorProduct.liftAddHom_tmul _ m s
 
 /-- The inverse comparison sends a Mathlib pure tensor to the corresponding
 balanced pure tensor. -/
@@ -659,7 +658,7 @@ theorem tensorProductLinearEquiv_naturality {M N : ModuleCat.{uM} Rᵐᵒᵖ}
           (map φ g.hom).toAddMonoidHom =
         tensorMap.toAddMonoidHom.comp
           (tensorProductLinearEquiv φ M).toLinearMap.toAddMonoidHom := by
-    apply @BalancedTensorProduct.hom_ext R M S _ M.isAddCommGroup
+    apply @BalancedTensorProduct.addHom_ext R M S _ M.isAddCommGroup
       (ModuleCat.of S S).isAddCommGroup M.isModule φ.toModule
       (tensorProductObj φ N) (tensorProductObj φ N).isAddCommGroup.toAddMonoid
     intro m s
@@ -983,21 +982,21 @@ noncomputable def oppositeScalarEquiv (φ : R →+* S)
         { toFun := fun m ↦ tmul φ m (MulOpposite.unop s)
           map_zero' := by
             let : Module R S := φ.toModule
-            exact BalancedTensorProduct.zero_tmul (MulOpposite.unop s)
+            exact BalancedTensorProduct.zero_tmul ℤ _ (MulOpposite.unop s)
           map_add' := fun m n ↦ by
             let : Module R S := φ.toModule
-            exact BalancedTensorProduct.add_tmul m n (MulOpposite.unop s) }
+            exact BalancedTensorProduct.add_tmul ℤ _ m n (MulOpposite.unop s) }
       map_zero' := by
         apply AddMonoidHom.ext
         intro m
         let : Module R S := φ.toModule
-        exact BalancedTensorProduct.tmul_zero m
+        exact BalancedTensorProduct.tmul_zero ℤ _ m
       map_add' := by
         intro s t
         apply AddMonoidHom.ext
         intro m
         let : Module R S := φ.toModule
-        exact BalancedTensorProduct.tmul_add m (MulOpposite.unop s) (MulOpposite.unop t) }
+        exact BalancedTensorProduct.tmul_add ℤ _ m (MulOpposite.unop s) (MulOpposite.unop t) }
   have balanced (r : Rᵐᵒᵖ) (s : Sᵐᵒᵖ) (m : M) :
       pureInverse (r • s) m = pureInverse s (r • m) := by
     change tmul φ m (MulOpposite.unop s * φ (MulOpposite.unop r)) =
@@ -1009,7 +1008,7 @@ noncomputable def oppositeScalarEquiv (φ : R →+* S)
       inverse (s ⊗ₜ[Rᵐᵒᵖ] m) = tmul φ m (MulOpposite.unop s) := rfl
   have leftHom : inverse.comp forward.toAddMonoidHom = AddMonoidHom.id (Obj φ M) := by
     let : Module R S := φ.toModule
-    apply BalancedTensorProduct.hom_ext (R := R) (M := M) (N := S)
+    apply BalancedTensorProduct.addHom_ext (R := R) (M := M) (N := S)
     intro m s
     change inverse (forward (tmul φ m s)) = tmul φ m s
     exact (congrArg inverse (forward_tmul m s)).trans

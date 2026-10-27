@@ -55,7 +55,7 @@ noncomputable def rightSpanFiniteProjective (he : IsIdempotentElem e) :
   have he' : IsIdempotentElem (MulOpposite.op e) :=
     congrArg (MulOpposite.op : R → Rᵐᵒᵖ) he.eq
   let _ : Module.Projective Rᵐᵒᵖ (Ideal.span {MulOpposite.op e}) :=
-    he'.projective_span
+    he'.projective_span_singleton
   exact ModuleCat.FiniteProjective.of Rᵐᵒᵖ (Ideal.span {MulOpposite.op e})
 
 /-- The carrier of the bundled idempotent right ideal is the principal ideal. -/

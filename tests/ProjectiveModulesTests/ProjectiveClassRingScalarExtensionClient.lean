@@ -47,7 +47,8 @@ private theorem rational_regular_ne_zero : ProjectiveClass.of ℚ ℚᵐᵒᵖ �
 -- The entire direct-sum monoid is retained, including its stored nsmul field.
 example (R : Type uR) [rR : CommRing R] :
     (@ProjectiveClass.instCommSemiring R rR).toAddCommMonoid =
-      @KTheory.instAddCommMonoidProjectiveClass R rR.toRing := rfl
+      (inferInstance : AddCommMonoid
+        (TauCeti.ObjectCode (ModuleCat.FiniteProjective.{uR, uR} Rᵐᵒᵖ))) := rfl
 
 private noncomputable def integerExtension : ProjectiveClass ℤ →+* ProjectiveClass ℚ :=
   ProjectiveClass.mapRingHom (Int.castRingHom ℚ)
@@ -62,10 +63,8 @@ private theorem integerExtension_regular :
   have h := congrArg
     (fun F :
       @AddMonoidHom (ProjectiveClass ℤ) (ProjectiveClass ℚ)
-        (@KTheory.instAddCommMonoidProjectiveClass ℤ
-          (inferInstance : CommRing ℤ).toRing).toAddMonoid.toAddZeroClass.toAddZero
-        (@KTheory.instAddCommMonoidProjectiveClass ℚ
-          (inferInstance : CommRing ℚ).toRing).toAddMonoid.toAddZeroClass.toAddZero ↦
+        (KTheory.instAddCommMonoidProjectiveClass ℤ).toAddMonoid.toAddZeroClass.toAddZero
+        (KTheory.instAddCommMonoidProjectiveClass ℚ).toAddMonoid.toAddZeroClass.toAddZero ↦
       F (ProjectiveClass.of ℤ ℤᵐᵒᵖ))
     (ProjectiveClass.mapRingHom_toAddMonoidHom (Int.castRingHom ℚ))
   exact h.trans (ProjectiveClass.map_of_self (Int.castRingHom ℚ))

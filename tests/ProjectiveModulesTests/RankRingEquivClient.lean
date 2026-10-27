@@ -75,7 +75,7 @@ example :
 
 -- Keep the stock 2-adic scalar dictionary, rather than transporting a field model.
 private theorem padic_dictionary :
-    (inferInstance : CommRing (PadicInt 2)) = PadicInt.instCommRing := rfl
+    (inferInstance : CommRing (PadicInt 2)) = instCommRingPadicInt 2 := rfl
 
 example :
     K0.localRingEquivInt (PadicInt 2)

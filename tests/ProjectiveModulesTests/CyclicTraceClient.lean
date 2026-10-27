@@ -109,7 +109,7 @@ private theorem zero_ring_zero_trace_not_injective :
 
 private theorem zero_ring_not_invariantBasisNumber : ¬ InvariantBasisNumber (ZMod 1) := by
   intro h
-  exact (ZMod.nontrivial_iff.mp
-    (@nontrivial_of_invariantBasisNumber (ZMod 1) _ h)) rfl
+  let : InvariantBasisNumber (ZMod 1) := h
+  exact (ZMod.nontrivial_iff.mp (inferInstance : Nontrivial (ZMod 1))) rfl
 
 end ProjectiveModulesTests.CyclicTraceClient

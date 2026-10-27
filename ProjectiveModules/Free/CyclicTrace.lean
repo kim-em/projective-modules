@@ -61,21 +61,6 @@ theorem trace_mul_comm_of_addMonoidHom (τ : R →+ A)
 
 end Matrix
 
-namespace Matrix
-
-variable {m : Type uM} {n : Type uN} [Fintype m] [Fintype n]
-variable {R : Type uR} [AddCommMonoid R] [CommMagma R]
-
-/-- The identity additive map specializes the cyclic trace identity to the
-commutative-multiplication setting of `Matrix.trace_mul_comm`. -/
-theorem trace_mul_comm_of_addMonoidHom_id
-    (X : Matrix m n R) (Y : Matrix n m R) :
-    trace (X * Y) = trace (Y * X) := by
-  simpa using trace_mul_comm_of_addMonoidHom (AddMonoidHom.id R)
-    (by intro x y; exact congrArg (AddMonoidHom.id R) (mul_comm x y)) X Y
-
-end Matrix
-
 namespace AddMonoidHom
 
 variable {R : Type uR} {A : Type uA} [Semiring R] [AddCommMonoid A]

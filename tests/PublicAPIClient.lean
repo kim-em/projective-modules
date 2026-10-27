@@ -63,13 +63,13 @@ private theorem invertible_scalar [Module.Invertible R M] (f : Module.End R M) :
 
 private theorem base_change {S : Type w} [CommRing S] [Algebra R S] :
     Nonempty (ExteriorAlgebra S (S ⊗[R] M) ≃ₐ[S] S ⊗[R] ExteriorAlgebra R M) :=
-  ⟨ExteriorAlgebra.equivBaseChange⟩
+  ⟨(ExteriorAlgebra.baseChangeEquiv _ _ _).symm⟩
 
 private theorem base_change_generator {S : Type w} [CommRing S] [Algebra R S]
     (s : S) (m : M) :
-    ExteriorAlgebra.toBaseChange (ExteriorAlgebra.ι S (s ⊗ₜ[R] m)) =
+    (ExteriorAlgebra.baseChangeEquiv R M S).symm (ExteriorAlgebra.ι S (s ⊗ₜ[R] m)) =
       s ⊗ₜ[R] ExteriorAlgebra.ι R m :=
-  ExteriorAlgebra.toBaseChange_ι_tmul s m
+  ExteriorAlgebra.baseChangeEquiv_symm_apply R M S s m
 
 private theorem direct_sum (N : Type w) [AddCommGroup N] [Module R N] (k : ℕ) :
     Nonempty ((⋀[R]^k (M × N)) ≃ₗ[R]
@@ -85,7 +85,7 @@ private theorem direct_sum_naturality {N : Type w} [AddCommGroup N] [Module R N]
   exteriorPower.prodEquivDirectSum_naturality R M N k f g
 
 private theorem top_degree (n : ℕ) : Nonempty ((⋀[R]^n (Fin n → R)) ≃ₗ[R] R) :=
-  ⟨exteriorPower.standardTopEquiv R n⟩
+  ⟨(Pi.basisFun R (Fin n)).exteriorPowerTopEquiv⟩
 
 private theorem componentwise_finite (h : Module.ComponentwiseFree R M) :
     Module.Finite R M := h.finite
@@ -101,11 +101,12 @@ private theorem componentwise_classification {N : Type w} [AddCommGroup N] [Modu
 
 private theorem arbitrary_pid [IsDomain R] [IsPrincipalIdealRing R]
     [Module.Projective R M] : Module.Free R M :=
-  Module.Projective.free_of_pid R M
+  Module.Free.of_injective_of_projective_of_isPrincipalIdealRing
+    (LinearMap.id : M →ₗ[R] M) Function.injective_id
 
 private theorem pid_submodule [IsDomain R] [IsPrincipalIdealRing R]
     [Module.Free R M] (N : Submodule R M) : Module.Free R N :=
-  N.free_of_pid_of_free
+  N.free_of_isPrincipalIdealRing
 
 private theorem determinant_matrix (n : ℕ) (g : Matrix (Fin n) (Fin n) R) :
     exteriorPower.determinant R (Fin n → R) n (Matrix.toLin' g) = Matrix.det g :=
@@ -156,7 +157,7 @@ private theorem zero_integer_finsupp_submodule :
 private theorem characteristic_two_base_change :
     Nonempty (ExteriorAlgebra (ZMod 2) ((ZMod 2) ⊗[ℤ] ℤ) ≃ₐ[ZMod 2]
       (ZMod 2) ⊗[ℤ] ExteriorAlgebra ℤ ℤ) :=
-  ⟨ExteriorAlgebra.equivBaseChange⟩
+  ⟨(ExteriorAlgebra.baseChangeEquiv _ _ _).symm⟩
 
 private theorem degree_zero :
     Nonempty ((⋀[ℤ]^0 (ℤ × ℤ)) ≃ₗ[ℤ]
@@ -215,7 +216,7 @@ private theorem arbitrary_local [Module.Projective Rᵐᵒᵖ M]
 private theorem tensor_injective [Module.Projective Rᵐᵒᵖ M]
     {N : Type x} [AddCommGroup N] [Module R N]
     (i : P →ₗ[R] N) (hi : Function.Injective i) :
-    Function.Injective (BalancedTensorProduct.mapRight (M := M) i) :=
+    Function.Injective (TauCeti.BalancedTensorProduct.mapRight (M := M) i) :=
   Module.Projective.balancedTensor_injective i hi
 
 private theorem right_balance (f : R →+* S) (r : R) (m : M) (s : S) :
@@ -292,13 +293,26 @@ section Categories
 
 variable (R : Type u) [Ring R] (M N : ModuleCat.{v} R)
 
-private theorem stable_zero : ModuleCat.FactorsThroughProjective R (0 : M ⟶ N) :=
-  ModuleCat.FactorsThroughProjective.zero
+private theorem stable_zero :
+    (TauCeti.ExactStructure.abelian (ModuleCat.{v} R)).isProjective.FactorsThrough
+      (0 : M ⟶ N) :=
+  CategoryTheory.ObjectProperty.FactorsThrough.zero _ _ _
 
 private theorem ext_detection [Small.{v} R] (f : M ⟶ N) :
-    ModuleCat.FactorsThroughProjective R f ↔
+    (TauCeti.ExactStructure.abelian (ModuleCat.{v} R)).isProjective.FactorsThrough f ↔
       ∀ (A : ModuleCat.{v} R), (Ext.mk₀ f).precomp A (zero_add 1) = 0 :=
-  ModuleCat.FactorsThroughProjective.iff_ext_one_precomp_eq_zero f
+  ModuleCat.projectiveFactorsThrough_iff_ext_one_precomp_eq_zero f
+
+private theorem canonical_stable_ext_detection [Small.{v} R] (f : M ⟶ N) :
+    (TauCeti.ExactStructure.abelian (ModuleCat.{v} R)).projectiveStableFunctor.map f = 0 ↔
+      ∀ (A : ModuleCat.{v} R), (Ext.mk₀ f).precomp A (zero_add 1) = 0 := by
+  rw [TauCeti.ExactStructure.projectiveStableFunctor_map_eq_zero_iff,
+    ModuleCat.projectiveFactorsThrough_iff_ext_one_precomp_eq_zero]
+
+private noncomputable def canonical_stable_projective_summand
+    (P : ModuleCat.{v} R) [CategoryTheory.Projective P] :=
+  (TauCeti.ExactStructure.abelian (ModuleCat.{v} R)).projectiveStableIsoBiprod
+    ((TauCeti.ExactStructure.abelian_isProjective_iff P).mpr inferInstance) M
 
 private theorem finite_projective_object (P : Type v) [AddCommGroup P] [Module R P]
     [Module.Finite R P] [Module.Projective R P] :

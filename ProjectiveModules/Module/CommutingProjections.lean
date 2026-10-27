@@ -13,6 +13,7 @@ public import Mathlib.Data.Fintype.Pi
 public import Mathlib.LinearAlgebra.Pi
 public import Mathlib.LinearAlgebra.Projection
 public import ProjectiveModules.Module.ComponentwiseFree
+public import TauCeti.RingTheory.Idempotents.Module
 
 /-!
 # Finite commuting projections
@@ -97,50 +98,35 @@ variable {M : Type uM} [AddCommMonoid M] [Module R M]
 variable {I : Type uI} [Fintype I]
 variable {e : I → Module.End R M}
 
-open scoped Classical in
+open scoped Pointwise in
+private theorem smul_top_eq_range (f : Module.End R M) :
+    f • (⊤ : Submodule R M) = f.range := by
+  ext x
+  simp only [Submodule.mem_smul_pointwise_iff_exists, Submodule.mem_top, true_and,
+    Module.End.smul_def, LinearMap.mem_range]
+
+open scoped Classical Pointwise in
 private theorem apply_coeLinearMap_ranges (he : CompleteOrthogonalIdempotents e)
     (b : DirectSum I (fun j ↦ (e j).range)) (i : I) :
     e i (DirectSum.coeLinearMap (fun j ↦ (e j).range) b) = (b i : M) := by
-  classical
-  induction b using DirectSum.induction_on with
-  | zero => simp
-  | of j b =>
-    rw [DirectSum.coeLinearMap_of]
-    by_cases hij : i = j
-    · subst j
-      rw [DirectSum.of_eq_same]
-      exact (LinearMap.IsIdempotentElem.mem_range_iff (he.idem i)).mp b.property
-    · rw [DirectSum.of_eq_of_ne _ _ _ hij]
-      change e i (b : M) = 0
-      obtain ⟨x, hx⟩ := b.property
-      rw [← hx, ← Module.End.mul_apply, he.ortho hij, LinearMap.zero_apply]
-  | add b c hb hc =>
-    simpa only [map_add, DirectSum.add_apply, Submodule.coe_add] using
-      congrArg₂ (· + ·) hb hc
+  have h := TauCeti.smul_coeLinearMap_smul_top
+    (S := R) (R := Module.End R M) (M := M) he.toOrthogonalIdempotents
+  have htransport : ∀ (F : I → Submodule R M),
+      F = (fun j ↦ e j • (⊤ : Submodule R M)) →
+        ∀ (z : DirectSum I (fun j ↦ F j)) (j : I),
+          e j (DirectSum.coeLinearMap F z) = (z j : M) := by
+    intro F hF
+    subst F
+    exact h
+  exact htransport (fun j ↦ (e j).range)
+    (funext fun j ↦ (smul_top_eq_range (e j)).symm) b i
 
-open scoped Classical in
-/-- The ranges of a complete orthogonal family of endomorphisms form an
-internal direct sum, over a semiring and an additive commutative monoid. -/
+open scoped Classical Pointwise in
+/-- The ranges of a complete orthogonal endomorphism family form an internal direct sum. -/
 theorem isInternal_ranges (he : CompleteOrthogonalIdempotents e) :
     DirectSum.IsInternal (fun i ↦ (e i).range) := by
-  classical
-  change Function.Bijective (DirectSum.coeLinearMap (fun i ↦ (e i).range))
-  constructor
-  · intro b c h
-    apply DirectSum.ext
-    intro i
-    apply Subtype.ext
-    calc
-      (b i : M) = e i (DirectSum.coeLinearMap (fun j ↦ (e j).range) b) :=
-        (apply_coeLinearMap_ranges he b i).symm
-      _ = e i (DirectSum.coeLinearMap (fun j ↦ (e j).range) c) := congrArg (e i) h
-      _ = (c i : M) := apply_coeLinearMap_ranges he c i
-  · intro x
-    refine ⟨∑ i, DirectSum.lof R I (fun j ↦ (e j).range) i
-      ⟨e i x, LinearMap.mem_range_self (e i) x⟩, ?_⟩
-    simp only [map_sum, DirectSum.coeLinearMap_lof]
-    simpa only [LinearMap.sum_apply, Module.End.one_apply] using
-      LinearMap.congr_fun he.complete x
+  simpa only [smul_top_eq_range] using
+    TauCeti.isInternal_smul_top (S := R) (R := Module.End R M) (M := M) he
 
 /-- The decomposition into ranges of a finite complete orthogonal family,
 obtained from the canonical internal direct sum and its finite-product map. -/

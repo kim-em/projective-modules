@@ -106,3 +106,26 @@ family, scalar-field continuous linear equivalence, bounded-convergence topology
 and closed-kernel continuity for linear forms; the Hausdorff line argument also
 supplies the given module topology. No completeness or norm on the line is
 needed, and no vector or frame is supplied by the caller.
+
+## Canonical providers after dependency consolidation
+
+Tau Ceti supplies the balanced-tensor carrier and outer actions, exact stable
+quotient, finite-projective object-code monoid and SplitK0 comparison framework,
+Grothendieck-ring API, ordinary-coefficient bidual evaluation and opposite dual,
+projectivity transitivity, PID freeness, self-injective transfer, compact-element
+transport, Wedderburn presentation, module-equivalence submodules/finite generation,
+and exterior-power basis, product and base-change constructions. Mathlib supplies
+the full exterior-algebra base-change equivalence and rectangular trace commutation.
+The [current API guide](API.md) links these providers at their pinned revisions.
+
+The external library retains its additional exactness and right-extension
+coherence, Ext detection, trace, determinant, rank, stabilization and specialized
+K₀ mathematics on these canonical constructions. Original Formal Frontier
+contributions and adaptations remain credited above; importing a replacement
+does not transfer authorship of the upstream implementation. The consolidation
+was prepared by Codex at the user's direction. Upstream Apache-2.0 notices and
+source authors remain in their respective repositories. The Group Theory
+Grothendieck-ring implementation is no longer imported or required.
+
+The [historical API records](history/README.md) retain their original producer
+metadata. They do not describe or certify the migrated API.

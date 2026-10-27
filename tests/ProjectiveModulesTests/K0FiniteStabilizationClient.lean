@@ -163,13 +163,13 @@ private theorem firstFinite : Module.Finite RatProductᵐᵒᵖ FirstIdeal :=
   Module.Finite.span_singleton _ _
 
 private theorem firstProjective : Module.Projective RatProductᵐᵒᵖ FirstIdeal :=
-  first_isIdempotent.projective_span
+  first_isIdempotent.projective_span_singleton
 
 private theorem secondFinite : Module.Finite RatProductᵐᵒᵖ SecondIdeal :=
   Module.Finite.span_singleton _ _
 
 private theorem secondProjective : Module.Projective RatProductᵐᵒᵖ SecondIdeal :=
-  first_isIdempotent.one_sub.projective_span
+  first_isIdempotent.one_sub.projective_span_singleton
 
 attribute [local instance] firstFinite firstProjective secondFinite secondProjective
 

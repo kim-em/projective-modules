@@ -7,6 +7,7 @@ module
 public import ProjectiveModules.Module.Trace.Comparison
 
 import Mathlib.LinearAlgebra.Dual.BaseChange
+public import Mathlib.RingTheory.TensorProduct.Finite
 
 /-!
 # Finite-projective trace and scalar extension

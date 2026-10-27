@@ -336,7 +336,7 @@ private def liftedFreeEquiv :
   left_inv _ := rfl
   right_inv y := by
     funext i
-    exact ULift.ext _ _ rfl
+    exact ULift.ext rfl
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 

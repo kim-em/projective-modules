@@ -46,7 +46,7 @@ lemma hb1 : b ≠ 1 :=
   fun h ↦ zero_ne_one (congrArg (fun x : S ↦ x.unop.2) h)
 
 instance : Module.Finite S I := Module.Finite.span_singleton S b
-instance : Module.Projective S I := hb.projective_span
+instance : Module.Projective S I := hb.projective_span_singleton
 instance : Nontrivial I := Submodule.nontrivial_span_singleton hb0
 
 example : ¬ Module.Free S I := hb.not_free_span hb0 hb1

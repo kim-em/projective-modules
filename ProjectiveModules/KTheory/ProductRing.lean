@@ -33,7 +33,7 @@ under `KTheory.K0.piEquiv`, while the module is not free.
   the additive comparison `KTheory.K0.piMap` and finite-family equivalence
   `KTheory.K0.piEquiv`, right scalar extension and tensor-product K₀ formalizations.
 * The tensor ring in `ProjectiveModules.KTheory.Ring` uses the group-completion
-  ring infrastructure of `GroupTheory.MonoidLocalization.GrothendieckGroup.Ring`.
+  ring infrastructure of `TauCeti.RingTheory.GrothendieckRing`.
 -/
 
 @[expose] public section
@@ -84,9 +84,9 @@ theorem piMap_mul (x y : K0 (∀ i, Ri i)) :
     intro a
     change F (ofClass (∀ i, Ri i) a) = _
     dsimp only [F]
-    rw [Algebra.GrothendieckAddGroup.liftRingHom_apply]
-    change lift (∀ i, Ri i) _ (ofClass (∀ i, Ri i) a) = _
-    rw [lift_ofClass]
+    change Algebra.GrothendieckAddGroup.liftRingHom _
+      (Algebra.GrothendieckAddGroup.of a) = _
+    rw [Algebra.GrothendieckAddGroup.liftRingHom_apply_of]
     change ((ofClassRingHom (Ri i)).comp
       (ProjectiveClass.mapRingHom (Pi.evalRingHom Ri i))) a = _
     rw [RingHom.comp_apply, ofClassRingHom_apply,

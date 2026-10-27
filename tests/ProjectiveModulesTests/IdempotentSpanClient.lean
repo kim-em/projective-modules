@@ -59,7 +59,7 @@ theorem product_fields_first :
       Module.Projective (K × L)ᵐᵒᵖ (Ideal.span {MulOpposite.op ((1 : K), (0 : L))}) ∧
       Nontrivial (Ideal.span {MulOpposite.op ((1 : K), (0 : L))} : Ideal (K × L)ᵐᵒᵖ) ∧
       ¬ Module.Free (K × L)ᵐᵒᵖ (Ideal.span {MulOpposite.op ((1 : K), (0 : L))}) := by
-  exact ⟨Module.Finite.span_singleton _ _, (first_isIdempotent K L).projective_span,
+  exact ⟨Module.Finite.span_singleton _ _, (first_isIdempotent K L).projective_span_singleton,
     Submodule.nontrivial_span_singleton (first_ne_zero K L),
     (first_isIdempotent K L).not_free_span (first_ne_zero K L) (first_ne_one K L)⟩
 
@@ -77,7 +77,7 @@ theorem product_fields_complement :
     intro h
     exact first_ne_zero K L (sub_eq_self.mp h)
   exact ⟨Module.Finite.span_singleton _ _,
-    (first_isIdempotent K L).one_sub.projective_span,
+    (first_isIdempotent K L).one_sub.projective_span_singleton,
     Submodule.nontrivial_span_singleton h0,
     (first_isIdempotent K L).one_sub.not_free_span h0 h1⟩
 
@@ -146,8 +146,8 @@ theorem boundaries_finite_projective :
       Module.Projective R (Ideal.span {(0 : R)}) ∧
       Module.Finite R (Ideal.span {(1 : R)}) ∧
       Module.Projective R (Ideal.span {(1 : R)}) :=
-  ⟨Module.Finite.span_singleton _ _, IsIdempotentElem.zero.projective_span,
-    Module.Finite.span_singleton _ _, IsIdempotentElem.one.projective_span⟩
+  ⟨Module.Finite.span_singleton _ _, IsIdempotentElem.zero.projective_span_singleton,
+    Module.Finite.span_singleton _ _, IsIdempotentElem.one.projective_span_singleton⟩
 
 end RingBoundaries
 

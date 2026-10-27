@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
 # Authors: Formal Frontier Agents
-"""Build the Projective Modules Markdown API from pinned native doc-gen4 data.
+"""Reproduce the historical Projective Modules API from pinned native doc-gen4 data.
+
+This fixed inventory predates the Tau Ceti migration; it does not document the
+current library. The current API guide is authored in docs/API.md. Historical
+output defaults to docs/history, preserving the current guide.
 
 This fixed-library adapter checks source bytes, display identities, signatures,
 docstring contents, and module records. Native generation and proof checks remain
@@ -320,7 +324,7 @@ def render(records, revision, sources):
              "Headers below are complete native *display* signatures, including implicit",
              "parameters and visible modifiers. They are not proof bodies. Pretty-printing",
              "can suppress inferable types; consult the linked source for elaboration context.",
-             "Links resolve relative to this checkout, not to an unpublished GitHub commit.",
+             "Source links identify the recorded historical revision, not this checkout.",
              "[Generation and limits](README.md) · [Credits](CREDITS.md) ·",
              "[source and tool manifest](api-manifest.json).", "",
              "Missing source docstrings are explicitly marked; no authored notes are passed off as native docs.", ""]
@@ -341,7 +345,8 @@ def render(records, revision, sources):
                 lines += [row["doc"], ""]
             else:
                 lines += ["*No source docstring is attached to this native display.*", ""]
-            lines += [f"[Source](../{row['path']}#L{row['line']}-L{row['end_line']}) "
+            lines += [f"[Source](https://github.com/FormalFrontier/projective-modules/blob/{revision}/"
+                      f"{row['path']}#L{row['line']}-L{row['end_line']}) "
                       f"(native database range lines {row['line']}–{row['end_line']}).", ""]
     markdown = "\n".join(lines).encode()
     root = HERE.parent
@@ -375,6 +380,8 @@ def main():
     parser.add_argument("--native-db", type=Path,
                         help="genuine native SQLite source for active end-range checking")
     parser.add_argument("--source-revision", required=True)
+    parser.add_argument("--output-directory", type=Path, default=HERE.parent / "docs/history",
+                        help="historical output directory (default: docs/history)")
     parser.add_argument("--check", action="store_true", help="compare, never write")
     args = parser.parse_args()
     require(re.fullmatch(r"[0-9a-f]{40}", args.source_revision) is not None,
@@ -402,17 +409,20 @@ def main():
     if committed_source:
         binding = "git-object"
     else:
-        manifest_source_binding(json.loads((root / "docs/api-manifest.json").read_bytes()),
+        prior_manifest = args.output_directory / "api-manifest.json"
+        manifest_source_binding(json.loads(prior_manifest.read_bytes()),
                                 args.source_revision, sources, records)
         binding = "committed-source-hashes"
     api, manifest = render(records, args.source_revision, sources)
     if args.check:
-        previous = json.loads((root / "docs/api-manifest.json").read_bytes())
+        previous = json.loads((args.output_directory / "api-manifest.json").read_bytes())
         require(previous["native_record_canonical_sha256"] ==
                 json.loads(manifest)["native_record_canonical_sha256"],
                 "native records differ from shipped manifest")
+    if not args.check:
+        args.output_directory.mkdir(parents=True, exist_ok=True)
     for name, raw in (("API.md", api), ("api-manifest.json", manifest)):
-        target = root / "docs" / name
+        target = args.output_directory / name
         if args.check:
             require(target.read_bytes() == raw, "generated file differs: " + name)
         else:

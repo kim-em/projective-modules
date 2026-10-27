@@ -10,7 +10,7 @@ public import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 public import Mathlib.Algebra.Module.Opposite
 public import Mathlib.CategoryTheory.Opposites
 public import ProjectiveModules.Category.FiniteProjective
-public import ProjectiveModules.Module.RightDual
+public import TauCeti.LinearAlgebra.Dual.Opposite
 
 import ProjectiveModules.Module.FiniteProjectiveHom
 import ProjectiveModules.Module.RightRegular
@@ -36,7 +36,7 @@ Hom presentation. Identity and composition also have pointwise forms.
 Restriction along `(RingEquiv.opOp R).symm.toRingHom` gives a canonical bundled
 module over `Rᵐᵒᵖᵐᵒᵖ`. `rightDualRestrictScalarsEquiv` compares this object
 with the forms valued in `Rᵐᵒᵖ`, by applying `op` to every value. This is the
-same coefficient operator as `LinearEquiv.rightDualOpposite`, now linear over
+same coefficient operator as `TauCeti.opDualCodomainEquiv`, now linear over
 the double-opposite ring. `isFiniteProjective_rightDual_restrictScalars` states
 finite-projective closure for this bundled normalization; it uses the Hom
 closure results of `ProjectiveModules.Module.FiniteProjectiveHom`, not a
@@ -49,7 +49,7 @@ whole-module-category equivalence or a new bidual construction.
   module, `LinearMap.lcomp`, and the `ModuleCat` morphism interface.
 * `ProjectiveModules.Module.RightRegular`, for the existing ordinary-carrier
   right regular module convention.
-* `ProjectiveModules.Module.RightDual`, for the semilinear coefficient
+* `TauCeti.LinearAlgebra.Dual.Opposite`, for the semilinear coefficient
   comparison, built from Mathlib's additive Hom equivalence.
 * `ProjectiveModules.Module.FiniteProjectiveHom`, for finite-projective Hom
   closure using Mathlib's finite-free splitting and retract APIs.
@@ -144,19 +144,19 @@ attribute [local instance] RingHomInvPair.of_ringEquiv RingHomInvPair.of_ringEqu
 /-- The right dual restricted along the inverse double-opposite isomorphism
 is linearly equivalent to the right-linear forms valued in `Rᵐᵒᵖ`. The
 underlying additive operator and its inverse are those of
-`LinearEquiv.rightDualOpposite`. -/
+`TauCeti.opDualCodomainEquiv`. -/
 def rightDualRestrictScalarsEquiv (M : ModuleCat.{uM} Rᵐᵒᵖ) :
     ((ModuleCat.restrictScalars (RingEquiv.opOp R).symm.toRingHom).obj
       ((ModuleCat.rightDual R).obj (Opposite.op M))) ≃ₗ[Rᵐᵒᵖᵐᵒᵖ]
         (M →ₗ[Rᵐᵒᵖ] Rᵐᵒᵖ) where
-  toAddEquiv := (LinearEquiv.rightDualOpposite R M).toAddEquiv
+  toAddEquiv := (TauCeti.opDualCodomainEquiv R M).toAddEquiv
   map_smul' := by
     intro a f
-    change LinearEquiv.rightDualOpposite R M
+    change TauCeti.opDualCodomainEquiv R M
         ((RingEquiv.opOp R).symm a • (show M →ₗ[Rᵐᵒᵖ] R from f)) =
-      a • LinearEquiv.rightDualOpposite R M (show M →ₗ[Rᵐᵒᵖ] R from f)
+      a • TauCeti.opDualCodomainEquiv R M (show M →ₗ[Rᵐᵒᵖ] R from f)
     simpa only [RingEquiv.coe_toRingHom, RingEquiv.apply_symm_apply] using
-      (LinearEquiv.rightDualOpposite R M).map_smulₛₗ
+      (TauCeti.opDualCodomainEquiv R M).map_smulₛₗ
         ((RingEquiv.opOp R).symm a) (show M →ₗ[Rᵐᵒᵖ] R from f)
 
 /-- The bundled coefficient comparison applies `op` to every value. -/
@@ -165,14 +165,14 @@ theorem rightDualRestrictScalarsEquiv_apply (M : ModuleCat.{uM} Rᵐᵒᵖ)
       ((ModuleCat.rightDual R).obj (Opposite.op M))) (m : M) :
     rightDualRestrictScalarsEquiv R M f m =
       MulOpposite.op ((show M →ₗ[Rᵐᵒᵖ] R from f) m) :=
-  LinearEquiv.rightDualOpposite_apply R M (show M →ₗ[Rᵐᵒᵖ] R from f) m
+  TauCeti.opDualCodomainEquiv_apply R M (show M →ₗ[Rᵐᵒᵖ] R from f) m
 
 /-- The inverse bundled coefficient comparison applies `unop` to every value. -/
 theorem rightDualRestrictScalarsEquiv_symm_apply (M : ModuleCat.{uM} Rᵐᵒᵖ)
     (f : M →ₗ[Rᵐᵒᵖ] Rᵐᵒᵖ) (m : M) :
     (show M →ₗ[Rᵐᵒᵖ] R from (rightDualRestrictScalarsEquiv R M).symm f) m =
       MulOpposite.unop (f m) :=
-  LinearEquiv.rightDualOpposite_symm_apply R M f m
+  TauCeti.opDualCodomainEquiv_symm_apply R M f m
 
 /-- The canonical bundled comparison commutes with the restricted dual
 morphism, which is precomposition by the original right-module morphism. -/
@@ -184,7 +184,7 @@ theorem rightDualRestrictScalarsEquiv_naturality
         ((ModuleCat.restrictScalars (RingEquiv.opOp R).symm.toRingHom).map
           ((ModuleCat.rightDual R).map g.op) f) =
       (rightDualRestrictScalarsEquiv R N f).comp g.hom := by
-  exact LinearEquiv.rightDualOpposite_naturality R M N g.hom
+  exact TauCeti.opDualCodomainEquiv_lcomp R g.hom
     (show N →ₗ[Rᵐᵒᵖ] R from f)
 
 /-- The canonically restricted right dual of a finite projective right module

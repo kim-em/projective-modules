@@ -95,10 +95,10 @@ local instance sourceProjective :
   matrixIdealSource_finite_projective.2
 
 private theorem evaluated_lift (m : matrixRightIdeal) :
-    LinearMap.bidualEvalEquiv (ULift.{uR} IntMatrix)ᵐᵒᵖ matrixIdealSource.{uR, uM}
+    TauCeti.opDualEvalEquiv (ULift.{uR} IntMatrix)ᵐᵒᵖ matrixIdealSource.{uR, uM}
       (show matrixIdealSource.{uR, uM} from ULift.up m) liftedForm =
         MulOpposite.op (ULift.up (matrixInclusion m)) := by
-  rw [LinearMap.bidualEvalEquiv_apply]
+  rw [TauCeti.opDualEvalEquiv_apply]
   rfl
 
 private theorem lifted_order :
@@ -143,21 +143,21 @@ private theorem lifted_moves :
   exact matrixInclusion_left_moves.2.1 (congrArg ULift.down h)
 
 private theorem evaluated_lift_moves :
-    LinearMap.bidualEvalEquiv (ULift.{uR} IntMatrix)ᵐᵒᵖ matrixIdealSource.{uR, uM}
+    TauCeti.opDualEvalEquiv (ULift.{uR} IntMatrix)ᵐᵒᵖ matrixIdealSource.{uR, uM}
         (show matrixIdealSource.{uR, uM} from ULift.up matrixGenerator)
         ((MulOpposite.opLinearEquiv (M := ULift.{uR} IntMatrix)
           (ULift.{uR} IntMatrix)ᵐᵒᵖ).toLinearMap.comp
             (ULift.up intE01 • liftedInclusion)) ≠
-      LinearMap.bidualEvalEquiv (ULift.{uR} IntMatrix)ᵐᵒᵖ matrixIdealSource.{uR, uM}
+      TauCeti.opDualEvalEquiv (ULift.{uR} IntMatrix)ᵐᵒᵖ matrixIdealSource.{uR, uM}
         (show matrixIdealSource.{uR, uM} from ULift.up matrixGenerator) liftedForm := by
   intro h
-  rw [LinearMap.bidualEvalEquiv_apply, LinearMap.bidualEvalEquiv_apply] at h
+  rw [TauCeti.opDualEvalEquiv_apply, TauCeti.opDualEvalEquiv_apply] at h
   apply lifted_moves.{uR, uM}
   exact MulOpposite.op_injective h
 
 example :
     ¬ Module.Free (ULift.{1} IntMatrix)ᵐᵒᵖ matrixIdealSource.{1, 0} ∧
-      LinearMap.bidualEvalEquiv (ULift.{1} IntMatrix)ᵐᵒᵖ matrixIdealSource.{1, 0}
+      TauCeti.opDualEvalEquiv (ULift.{1} IntMatrix)ᵐᵒᵖ matrixIdealSource.{1, 0}
         (show matrixIdealSource.{1, 0} from ULift.up matrixGenerator)
         liftedForm.{1, 0} ≠ 0 := by
   refine ⟨matrixIdealSource_not_free, ?_⟩
@@ -168,7 +168,7 @@ example :
 
 example :
     ¬ Module.Free (ULift.{0} IntMatrix)ᵐᵒᵖ matrixIdealSource.{0, 2} ∧
-      LinearMap.bidualEvalEquiv (ULift.{0} IntMatrix)ᵐᵒᵖ matrixIdealSource.{0, 2}
+      TauCeti.opDualEvalEquiv (ULift.{0} IntMatrix)ᵐᵒᵖ matrixIdealSource.{0, 2}
         (show matrixIdealSource.{0, 2} from ULift.up matrixUpperRightMember)
         liftedForm.{0, 2} ≠ 0 := by
   refine ⟨matrixIdealSource_not_free, ?_⟩

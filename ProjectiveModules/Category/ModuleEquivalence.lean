@@ -4,9 +4,11 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import TauCeti.Algebra.Category.ModuleCat.Equivalence
+
 public import ProjectiveModules.Category.FiniteProjective
 public import ProjectiveModules.Category.SubmoduleEquivalence
-public import ProjectiveModules.Module.Injective
+public import TauCeti.Algebra.Module.Injective.SelfInjective
 public import Mathlib.Algebra.Category.FGModuleCat.Basic
 public import Mathlib.Algebra.Module.FinitePresentation
 import Mathlib.Algebra.Category.ModuleCat.Injective
@@ -14,7 +16,7 @@ import Mathlib.Algebra.Category.ModuleCat.Subobject
 import Mathlib.CategoryTheory.Adjunction.Limits
 import Mathlib.CategoryTheory.Category.Preorder
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Kernels
-import ProjectiveModules.Order.CompactlyGenerated
+import TauCeti.Order.CompactlyGenerated
 
 /-!
 # Finite generation, presentation and projectivity under module-category equivalences
@@ -29,7 +31,7 @@ carrier universes have the corresponding form.
 
 ## Main results
 
-* `ModuleCat.finite_iff_of_equivalence`
+* `CategoryTheory.Equivalence.finite_functor_obj_iff`
 * `ModuleCat.finitePresentation_of_equivalence`
 * `ModuleCat.finitePresentation_iff_of_equivalence`
 * `ModuleCat.isFiniteProjective_of_equivalence`
@@ -73,7 +75,7 @@ with the lifted target regular module. Injectivity then descends from the lift.
   by Markus Himmel and Kim Morrison.
 * Mathlib's finiteness formalization by Johan Commelin, for the
   compact-submodule characterization. The order-theoretic transport uses
-  `ProjectiveModules.Order.CompactlyGenerated` and the Mathlib APIs credited there.
+  `TauCeti.Order.CompactlyGenerated` and the Mathlib APIs credited there.
 * Mathlib's finite-presentation and kernel criteria for modules by Andrew Yang.
 * The finite-projective object property and category by Formal Frontier Agents.
 * Mathlib's algebraic and categorical injectivity formalizations by Jujian Zhang
@@ -92,20 +94,6 @@ variable (R : Type uR) (S : Type uS) [Ring R] [Ring S]
 
 namespace ModuleCat
 
-/-- An equivalence of module categories preserves and reflects finite generation,
-with independent scalar and carrier universes.
-
-This is the finite-generation component of Morita invariance; see C. A. Weibel,
-*The K-book: An Introduction to Algebraic K-theory*. -/
-theorem finite_iff_of_equivalence
-    (e : ModuleCat.{vR} R ≌ ModuleCat.{vS} S) (X : ModuleCat.{vR} R) :
-    Module.Finite S (e.functor.obj X) ↔ Module.Finite R X := by
-  -- Every subobject is represented by a submodule, with no smallness of the ring.
-  let φ : Submodule R X ≃o Submodule S (e.functor.obj X) :=
-    submoduleOrderIsoOfEquivalence e X
-  -- Finite generation means compactness of the greatest submodule.
-  simp only [Module.finite_def, Submodule.fg_iff_compact]
-  simpa only [φ.map_top] using φ.isCompactElement_iff (⊤ : Submodule R X)
 
 end ModuleCat
 
@@ -138,7 +126,7 @@ theorem isFiniteProjective_of_equivalence
   -- Only the return to algebraic projectivity needs the supported target height.
   let : Small.{max uS vS} S := small_max S
   exact (isFiniteProjective_iff (e.functor.obj X)).mpr
-    ⟨(finite_iff_of_equivalence R S e X).mpr inferInstance,
+    ⟨(e.finite_functor_obj_iff X).mpr inferInstance,
       projective_of_module_projective (e.functor.obj X)⟩
 
 /-- An equivalence of module categories preserves and reflects finite projectivity
@@ -163,7 +151,7 @@ theorem isFiniteProjective_iff_of_equivalence
       (e.map_projective_iff X).mp inferInstance
     let : Small.{max uR vR} R := small_max R
     exact (isFiniteProjective_iff X).mpr
-      ⟨(finite_iff_of_equivalence R S e X).mp inferInstance,
+      ⟨(e.finite_functor_obj_iff X).mp inferInstance,
         projective_of_module_projective X⟩
   · exact isFiniteProjective_of_equivalence R S e X
 
@@ -192,7 +180,7 @@ theorem finitePresentation_of_equivalence
   intro hX
   have : Module.FinitePresentation R X := hX
   have : Module.Finite S (e.functor.obj X) :=
-    (finite_iff_of_equivalence R S e X).mpr inferInstance
+    (e.finite_functor_obj_iff X).mpr inferInstance
   obtain ⟨n, f, hf⟩ := Module.Finite.exists_fin' S (e.functor.obj X)
   -- The target height contains a finite free cover, without changing the source height.
   let P : ModuleCat.{max uS vS} S := of S (ULift.{vS} (Fin n → S))
@@ -204,7 +192,7 @@ theorem finitePresentation_of_equivalence
     Module.FinitePresentation.of_equiv liftEquiv.symm
   let q : e.inverse.obj P ⟶ e.inverse.obj (e.functor.obj X) := e.inverse.map p
   have : Module.Finite R (e.inverse.obj P) :=
-    (finite_iff_of_equivalence S R e.symm P).mpr inferInstance
+    (e.symm.finite_functor_obj_iff P).mpr inferInstance
   let unitEquiv : X ≃ₗ[R] e.inverse.obj (e.functor.obj X) :=
     (e.unitIso.app X).toLinearEquiv
   have : Module.FinitePresentation R (e.inverse.obj (e.functor.obj X)) :=
@@ -218,7 +206,7 @@ theorem finitePresentation_of_equivalence
   have : Module.Finite R (Limits.kernel q : ModuleCat.{vR} R) :=
     Module.Finite.equiv (kernelIsoKer q).toLinearEquiv.symm
   have : Module.Finite S (e.functor.obj (Limits.kernel q)) :=
-    (finite_iff_of_equivalence R S e (Limits.kernel q)).mpr inferInstance
+    (e.finite_functor_obj_iff (Limits.kernel q)).mpr inferInstance
   -- Kernel preservation followed by counit naturality identifies this with ker p.
   let i : e.functor.obj (Limits.kernel q) ≅ of S p.hom.ker :=
     Limits.PreservesKernel.iso e.functor q ≪≫
@@ -276,7 +264,7 @@ private theorem selfInjective_of_equivalence
   let : Module.Finite R (e.inverse.obj Y) := hX.1
   let : Module.Projective R (e.inverse.obj Y) := hX.2
   let : Module.Injective R (e.inverse.obj Y) :=
-    Module.injective_of_finite_projective R (e.inverse.obj Y)
+    Module.Injective.of_finite_projective (R := R) (P := e.inverse.obj Y) inferInstance
   let : CategoryTheory.Injective (e.inverse.obj Y) :=
     Module.injective_object_of_injective_module R (e.inverse.obj Y)
   have hImage : CategoryTheory.Injective (e.functor.obj (e.inverse.obj Y)) :=

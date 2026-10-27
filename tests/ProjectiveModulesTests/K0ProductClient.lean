@@ -261,8 +261,8 @@ private theorem complementary_sum :
     Module.Finite.span_singleton _ _
   let : Module.Finite Aᵐᵒᵖ (Ideal.span {MulOpposite.op eR}) :=
     Module.Finite.span_singleton _ _
-  let : Module.Projective Aᵐᵒᵖ (Ideal.span {MulOpposite.op eL}) := he.projective_span
-  let : Module.Projective Aᵐᵒᵖ (Ideal.span {MulOpposite.op eR}) := heR.projective_span
+  let : Module.Projective Aᵐᵒᵖ (Ideal.span {MulOpposite.op eL}) := he.projective_span_singleton
+  let : Module.Projective Aᵐᵒᵖ (Ideal.span {MulOpposite.op eR}) := heR.projective_span_singleton
   have spanEquiv : (Ideal.span {MulOpposite.op eL} × Ideal.span {MulOpposite.op eR})
       ≃ₗ[Aᵐᵒᵖ] Aᵐᵒᵖ := by
     rw [← hc]

@@ -6,6 +6,7 @@ Authors: Formal Frontier Agents
 -- Contributors: Formal Frontier Agents, including Iris; see docs/CREDITS.md
 module
 
+public import TauCeti.LinearAlgebra.ExteriorPower.Prod
 public import Mathlib.LinearAlgebra.Basis.Fin
 public import ProjectiveModules.ExteriorPower.DirectSum
 public import ProjectiveModules.ExteriorPower.StalkRank
@@ -32,55 +33,17 @@ namespace exteriorPower
 
 universe u v w
 
-/-- The ordered component of the existing exterior-power direct-sum decomposition.
-The `M` block precedes the `N` block. Its data uses only the stock equivalence,
-component inclusion, and the ambient-preserving transport of the right degree. -/
-@[no_expose]
-noncomputable def prodPairing
-    (R : Type u) (M : Type v) (N : Type w)
-    [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
-    (i j : ℕ) :
-    ((⋀[R]^i M) ⊗[R] (⋀[R]^j N)) →ₗ[R] ⋀[R]^(i + j) (M × N) :=
-  let t : Fin (i + j + 1) :=
-    ⟨i, Nat.lt_succ_iff.mpr (Nat.le_add_right i j)⟩
-  let rightDegree : (⋀[R]^j N) ≃ₗ[R] ⋀[R]^((i + j) - i) N :=
-    LinearEquiv.ofEq (ExteriorAlgebra.exteriorPower R j N)
-      (ExteriorAlgebra.exteriorPower R ((i + j) - i) N)
-      (congrArg (fun n : ℕ ↦ ExteriorAlgebra.exteriorPower R n N)
-        (Nat.add_sub_cancel_left i j).symm)
-  (prodEquivDirectSum R M N (i + j)).symm.toLinearMap ∘ₗ
-    DirectSum.lof R (Fin (i + j + 1))
-      (fun a ↦ (⋀[R]^a.1 M) ⊗[R] (⋀[R]^((i + j) - a.1) N)) t ∘ₗ
-        (TensorProduct.congr (LinearEquiv.refl R (⋀[R]^i M)) rightDegree).toLinearMap
-
-/-- The pairing is ambient exterior multiplication after the canonical inclusions,
-with the `M` factor first. This is the characteristic formula of
-`prodEquivDirectSum` on the selected summand. -/
-theorem coe_prodPairing_tmul
-    (R : Type u) (M : Type v) (N : Type w)
-    [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
-    (i j : ℕ) (a : ⋀[R]^i M) (b : ⋀[R]^j N) :
-    (prodPairing R M N i j (a ⊗ₜ[R] b)).val =
-      ExteriorAlgebra.map (LinearMap.inl R M N) a.val *
-        ExteriorAlgebra.map (LinearMap.inr R M N) b.val := by
-  exact coe_prodEquivDirectSum_symm_of_tmul R M N (i + j)
-    ⟨i, Nat.lt_succ_iff.mpr (Nat.le_add_right i j)⟩ a
-    (LinearEquiv.ofEq (ExteriorAlgebra.exteriorPower R j N)
-      (ExteriorAlgebra.exteriorPower R ((i + j) - i) N)
-      (congrArg (fun n : ℕ ↦ ExteriorAlgebra.exteriorPower R n N)
-        (Nat.add_sub_cancel_left i j).symm) b)
-
 /-- For finite flat modules of constant stalk ranks, the ordered top-degree pairing
 is bijective. Every other direct-sum component has a factor above its stalk rank
 and therefore vanishes. No global basis or projectivity is assumed. -/
-theorem bijective_prodPairing_of_rankAtStalk_eq
+theorem bijective_wedgeTensor_of_rankAtStalk_eq
     (R : Type u) (M : Type v) (N : Type w)
     [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
     [Module.Finite R M] [Module.Flat R M] [Module.Finite R N] [Module.Flat R N]
     (i j : ℕ)
     (hM : Module.rankAtStalk (R := R) M = (fun _ ↦ i))
     (hN : Module.rankAtStalk (R := R) N = (fun _ ↦ j)) :
-    Function.Bijective (prodPairing R M N i j) := by
+    Function.Bijective (TauCeti.exteriorPower.wedgeTensor R M N i j (i + j) rfl) := by
   classical
   let t : Fin (i + j + 1) :=
     ⟨i, Nat.lt_succ_iff.mpr (Nat.le_add_right i j)⟩
@@ -122,6 +85,16 @@ theorem bijective_prodPairing_of_rankAtStalk_eq
       (ExteriorAlgebra.exteriorPower R ((i + j) - i) N)
       (congrArg (fun n : ℕ ↦ ExteriorAlgebra.exteriorPower R n N)
         (Nat.add_sub_cancel_left i j).symm)
+  have hpair : TauCeti.exteriorPower.wedgeTensor R M N i j (i + j) rfl =
+      (prodEquivDirectSum R M N (i + j)).symm.toLinearMap ∘ₗ
+        DirectSum.lof R (Fin (i + j + 1)) β t ∘ₗ
+          (TensorProduct.congr (LinearEquiv.refl R (⋀[R]^i M)) rightDegree).toLinearMap := by
+    apply TensorProduct.ext'
+    intro a b
+    apply Subtype.ext
+    rw [TauCeti.exteriorPower.coe_wedgeTensor_tmul]
+    exact (coe_prodEquivDirectSum_symm_of_tmul R M N (i + j) t a (rightDegree b)).symm
+  rw [hpair]
   exact (prodEquivDirectSum R M N (i + j)).symm.bijective.comp
     (hinc.comp (TensorProduct.congr (LinearEquiv.refl R (⋀[R]^i M)) rightDegree).bijective)
 
@@ -158,15 +131,16 @@ private theorem integer_rankAtStalk :
 
 /-- The characteristic API applied to independent stock generators over `ℤ`. -/
 private theorem characteristic :
-    (prodPairing ℤ ℤ ℤ 1 1 (a ⊗ₜ[ℤ] b)).val =
+    (TauCeti.exteriorPower.wedgeTensor ℤ ℤ ℤ 1 1 2 rfl (a ⊗ₜ[ℤ] b)).val =
       ExteriorAlgebra.map (LinearMap.inl ℤ ℤ ℤ) a.val *
         ExteriorAlgebra.map (LinearMap.inr ℤ ℤ ℤ) b.val :=
-  coe_prodPairing_tmul ℤ ℤ ℤ 1 1 a b
+  TauCeti.exteriorPower.coe_wedgeTensor_tmul 1 1 2 rfl a b
 
 /-- The bijectivity API applied over `ℤ`.
 The finite and flat instances are the existing scalar-self instances. -/
-private theorem bijective : Function.Bijective (prodPairing ℤ ℤ ℤ 1 1) :=
-  bijective_prodPairing_of_rankAtStalk_eq ℤ ℤ ℤ 1 1
+private theorem bijective :
+    Function.Bijective (TauCeti.exteriorPower.wedgeTensor ℤ ℤ ℤ 1 1 2 rfl) :=
+  bijective_wedgeTensor_of_rankAtStalk_eq ℤ ℤ ℤ 1 1
     integer_rankAtStalk integer_rankAtStalk
 
 end IntegerProductPairing

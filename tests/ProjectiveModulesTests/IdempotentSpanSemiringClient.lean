@@ -53,8 +53,8 @@ theorem boundaries_finite_projective :
       Module.Projective R (Ideal.span {(0 : R)}) ∧
       Module.Finite R (Ideal.span {(1 : R)}) ∧
       Module.Projective R (Ideal.span {(1 : R)}) :=
-  ⟨Module.Finite.span_singleton _ _, IsIdempotentElem.zero.projective_span,
-    Module.Finite.span_singleton _ _, IsIdempotentElem.one.projective_span⟩
+  ⟨Module.Finite.span_singleton _ _, IsIdempotentElem.zero.projective_span_singleton,
+    Module.Finite.span_singleton _ _, IsIdempotentElem.one.projective_span_singleton⟩
 
 end Boundaries
 
@@ -165,7 +165,7 @@ theorem nat_retraction :
 theorem nat_finite_projective :
     Module.Finite NatMatrix (Ideal.span {natE11}) ∧
       Module.Projective NatMatrix (Ideal.span {natE11}) :=
-  ⟨Module.Finite.span_singleton _ _, natE11_isIdempotent.projective_span⟩
+  ⟨Module.Finite.span_singleton _ _, natE11_isIdempotent.projective_span_singleton⟩
 
 /-- A commutative semiring model combines projectivity with the existing
 nonfreeness client; the commutative free criterion is not generalized. -/
@@ -176,7 +176,7 @@ theorem legacy_nat_product_projective_nonfree :
   have he : IsIdempotentElem ((1, 0) : ℕ × ℕ) := by
     change (1, 0) * (1, 0) = ((1, 0) : ℕ × ℕ)
     ext <;> simp
-  exact ⟨Module.Finite.span_singleton _ _, he.projective_span,
+  exact ⟨Module.Finite.span_singleton _ _, he.projective_span_singleton,
     IdempotentSpanClient.nat_product_nonfree⟩
 
 /-- The canonical two-by-two matrix ring over the integers. -/

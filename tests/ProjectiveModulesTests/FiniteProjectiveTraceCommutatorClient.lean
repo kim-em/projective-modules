@@ -119,7 +119,7 @@ private theorem I_neg_coe (x : I) : ((-x : I) : R) = (0, -(x : R).2) := rfl
 
 private instance I_finite : Module.Finite R I := Module.Finite.span_singleton R e
 
-private instance I_projective : Module.Projective R I := e_isIdempotent.projective_span
+private instance I_projective : Module.Projective R I := e_isIdempotent.projective_span_singleton
 
 private theorem I_not_free : ¬ Module.Free R I :=
   e_isIdempotent.not_free_span e_ne_zero e_ne_one

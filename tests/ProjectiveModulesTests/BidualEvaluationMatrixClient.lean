@@ -40,25 +40,25 @@ private noncomputable def matrixOppositeForm :
     matrixInclusion
 
 private theorem evaluated_generator :
-    LinearMap.bidualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixGenerator
+    TauCeti.opDualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixGenerator
       matrixOppositeForm = MulOpposite.op intE11 := by
-  rw [LinearMap.bidualEvalEquiv_apply]
+  rw [TauCeti.opDualEvalEquiv_apply]
   change MulOpposite.op (matrixInclusion matrixGenerator) = MulOpposite.op intE11
   rw [matrixInclusion_generator]
 
 private theorem evaluated_upperRight :
-    LinearMap.bidualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixUpperRightMember
+    TauCeti.opDualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixUpperRightMember
       matrixOppositeForm = MulOpposite.op intE01 := by
-  rw [LinearMap.bidualEvalEquiv_apply]
+  rw [TauCeti.opDualEvalEquiv_apply]
   change MulOpposite.op (matrixInclusion matrixUpperRightMember) = MulOpposite.op intE01
   rw [matrixInclusion_upperRight]
 
 example :
     ¬ Module.Free IntMatrixᵐᵒᵖ matrixRightIdeal ∧ Nontrivial matrixRightIdeal ∧
       ¬ Commute intE11 intE01 ∧
-      LinearMap.bidualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixGenerator
+      TauCeti.opDualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixGenerator
         matrixOppositeForm ≠ 0 ∧
-      LinearMap.bidualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixUpperRightMember
+      TauCeti.opDualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixUpperRightMember
         matrixOppositeForm ≠ 0 := by
   refine ⟨matrixRightIdeal_not_free, matrixRightIdeal_controls.2.2.1,
     intE11_not_commute, ?_, ?_⟩
@@ -70,10 +70,10 @@ example :
     exact intE01_ne_zero (by simpa using congrArg MulOpposite.unop h)
 
 example :
-    LinearMap.bidualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixGenerator
+    TauCeti.opDualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixGenerator
         ((MulOpposite.opLinearEquiv (M := IntMatrix) IntMatrixᵐᵒᵖ).toLinearMap.comp
           (intE01 • matrixInclusion)) ≠
-      LinearMap.bidualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixGenerator
+      TauCeti.opDualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixGenerator
         matrixOppositeForm := by
   intro h
   apply matrixInclusion_left_moves.2.1
@@ -81,13 +81,13 @@ example :
 
 example :
     (MulOpposite.op intE11 •
-        (LinearMap.bidualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixUpperRightMember))
+        (TauCeti.opDualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixUpperRightMember))
       matrixOppositeForm = 0 ∧
-      LinearMap.bidualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal
+      TauCeti.opDualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal
         (MulOpposite.op intE11 • matrixUpperRightMember) matrixOppositeForm = 0 := by
   constructor
   · change MulOpposite.op intE11 *
-      (LinearMap.bidualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixUpperRightMember
+      (TauCeti.opDualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal matrixUpperRightMember
         matrixOppositeForm) = 0
     rw [evaluated_upperRight]
     change MulOpposite.op (intE01 * intE11) = 0
@@ -100,7 +100,7 @@ noncomputable example :
     matrixRightIdeal ≃ₗ[IntMatrixᵐᵒᵖ]
       ((matrixRightIdeal →ₗ[IntMatrixᵐᵒᵖ] IntMatrixᵐᵒᵖ) →ₗ[(IntMatrixᵐᵒᵖ)ᵐᵒᵖ]
         IntMatrixᵐᵒᵖ) :=
-  LinearMap.bidualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal
+  TauCeti.opDualEvalEquiv IntMatrixᵐᵒᵖ matrixRightIdeal
 
 example :
     LinearMap.flip (LinearMap.id :

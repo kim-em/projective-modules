@@ -163,7 +163,7 @@ theorem componentwiseFreeModel_projective {I : Type*} [Finite I]
     Module.Projective R (ComponentwiseFreeModel e n) := by
   let _ : Fintype I := Fintype.ofFinite I
   let _ (i : I) (k : Fin (n i)) : Module.Projective R (Ideal.span {e i}) :=
-    (he i).projective_span
+    (he i).projective_span_singleton
   let _ (i : I) : Module.Projective R (Fin (n i) → Ideal.span {e i}) :=
     Module.Projective.of_equiv'
       (DirectSum.linearEquivFunOnFintype R (Fin (n i)) fun _ ↦ Ideal.span {e i})
@@ -221,7 +221,7 @@ theorem rankAtStalk_componentwiseFreeModel_of_notMem {I : Type*} [Fintype I]
   let _ (j : I) (k : Fin (n j)) : Module.Finite R (Ideal.span {e j}) :=
     Module.Finite.span_singleton R _
   let _ (j : I) (k : Fin (n j)) : Module.Projective R (Ideal.span {e j}) :=
-    (he.idem j).projective_span
+    (he.idem j).projective_span_singleton
   let _ (j : I) : Module.Projective R (Fin (n j) → Ideal.span {e j}) :=
     Module.Projective.of_equiv'
       (DirectSum.linearEquivFunOnFintype R (Fin (n j)) fun _ ↦ Ideal.span {e j})

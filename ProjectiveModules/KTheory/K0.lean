@@ -5,10 +5,8 @@ Authors: Formal Frontier Agents
 module
 
 public import ProjectiveModules.Category.FiniteProjectiveSmallness
-public import Mathlib.Algebra.Group.Shrink
+public import TauCeti.CategoryTheory.GrothendieckGroup.Split
 public import Mathlib.Algebra.Module.Opposite
-public import Mathlib.CategoryTheory.Monoidal.Cartesian.Basic
-public import Mathlib.CategoryTheory.Monoidal.Skeleton
 public import Mathlib.GroupTheory.MonoidLocalization.GrothendieckGroup
 public import Mathlib.LinearAlgebra.StdBasis
 
@@ -31,13 +29,11 @@ this descent as an additive map when the function preserves zero and direct sum.
 
 ## Implementation notes
 
-The Cartesian monoidal structure used on the reference category chooses the
-zero module and the ordinary binary module product explicitly. It and its
-braiding are private to this construction; no tensor-product monoidal
-structure on modules is used. Essential smallness supplies the prerequisite
-for `Shrink`, whose existing algebraic transport resizes the class monoid.
-The group completion and its universal property are Mathlib's additive
-Grothendieck group, without any cancellation assumption.
+Tau Ceti's `ObjectCode` supplies the small additive monoid of isomorphism
+classes under binary biproduct. The ordinary product of module carriers is
+compared with this categorical biproduct explicitly. Mathlib's group completion
+of this monoid is canonically identified with Tau Ceti's `SplitK0` by
+`K0.splitK0Equiv`. Representatives accept independent carrier universes.
 
 ## References and credits
 
@@ -62,75 +58,15 @@ namespace KTheory
 
 variable (R : Type u) [Ring R]
 
-private abbrev RightProjective := ModuleCat.FiniteProjective.{u, u} Rᵐᵒᵖ
-
-private def zeroCone : LimitCone (Functor.empty.{0} (RightProjective R)) where
-  cone := asEmptyCone (ModuleCat.FiniteProjective.of Rᵐᵒᵖ PUnit.{u + 1})
-  isLimit := IsTerminal.ofUniqueHom
-    (fun X ↦ (ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ X _).symm 0)
-    (fun X f ↦ by
-      apply ModuleCat.FiniteProjective.hom_ext
-      ext x)
-
-private def productCone (X Y : RightProjective R) : LimitCone (pair X Y) where
-  cone := BinaryFan.mk
-    ((ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ
-      (ModuleCat.FiniteProjective.of Rᵐᵒᵖ (X × Y)) X).symm (LinearMap.fst Rᵐᵒᵖ X Y))
-    ((ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ
-      (ModuleCat.FiniteProjective.of Rᵐᵒᵖ (X × Y)) Y).symm (LinearMap.snd Rᵐᵒᵖ X Y))
-  isLimit := BinaryFan.IsLimit.mk _
-    (fun {T} f g ↦ (ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ T _).symm
-      ((ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ T X f).prod
-        (ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ T Y g)))
-    (fun _ _ ↦ by apply ModuleCat.FiniteProjective.hom_ext; rfl)
-    (fun _ _ ↦ by apply ModuleCat.FiniteProjective.hom_ext; rfl)
-    (fun {T} f g m hf hg ↦ by
-      apply ModuleCat.FiniteProjective.hom_ext
-      apply LinearMap.ext
-      intro x
-      apply Prod.ext
-      · exact congrArg
-          (fun h : T ⟶ X ↦ ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ T X h x) hf
-      · exact congrArg
-          (fun h : T ⟶ Y ↦ ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ T Y h x) hg)
-
-@[instance_reducible]
-private def directSumCartesian : CartesianMonoidalCategory (RightProjective R) :=
-  CartesianMonoidalCategory.ofChosenFiniteProducts (zeroCone R) (productCone R)
-
-attribute [local instance] directSumCartesian
-
-@[instance_reducible]
-private def directSumBraided : BraidedCategory (RightProjective R) :=
-  BraidedCategory.ofCartesianMonoidalCategory
-
-attribute [local instance] directSumBraided
-
-@[instance_reducible]
-private def directSumSymmetric : SymmetricCategory (RightProjective R) :=
-  CartesianMonoidalCategory.toSymmetricCategory
-
-attribute [local instance] directSumSymmetric
-
-private theorem smallAdditiveSkeleton :
-    Small.{u} (Additive (Skeleton (RightProjective R))) :=
-  small_map Additive.toMul
-
-attribute [local instance] smallAdditiveSkeleton
-
-/-- Isomorphism classes of finite projective right `R`-modules, with zero and
-binary direct sum as the commutative-monoid operations, in the ring universe. -/
+/-- Direct-sum classes of finite projective right modules, using Tau Ceti's
+canonical small monoid of object codes. -/
 noncomputable def ProjectiveClass : Type u :=
-  letI : Small.{u} (Additive (Skeleton (ModuleCat.FiniteProjective.{u, u} Rᵐᵒᵖ))) :=
-    small_map Additive.toMul
-  Shrink.{u} (Additive (Skeleton (ModuleCat.FiniteProjective.{u, u} Rᵐᵒᵖ)))
+  TauCeti.ObjectCode.{u} (ModuleCat.FiniteProjective.{u, u} Rᵐᵒᵖ)
 
-@[no_expose] noncomputable instance : AddCommMonoid (ProjectiveClass R) :=
-  inferInstanceAs (AddCommMonoid (Shrink.{u} (Additive (Skeleton (RightProjective R)))))
-
-private noncomputable def classEquiv :
-    ProjectiveClass R ≃+ Additive (Skeleton (RightProjective R)) :=
-  Shrink.addEquiv
+/-- Use the canonical object-code addition without exposing the categorical
+carrier to recursive algebraic instance search. -/
+noncomputable instance : AddCommMonoid (ProjectiveClass R) :=
+  TauCeti.instAddCommMonoidObjectCode (C := ModuleCat.FiniteProjective.{u, u} Rᵐᵒᵖ)
 
 namespace ProjectiveClass
 
@@ -140,16 +76,16 @@ variable (M : Type v) [AddCommGroup M] [Module Rᵐᵒᵖ M]
 /-- The direct-sum isomorphism class of a finite projective right module,
 using its ring-universe representative. -/
 @[no_expose] noncomputable def of : ProjectiveClass R :=
-  (classEquiv R).symm (Additive.ofMul (ModuleCat.FiniteProjective.isoClass Rᵐᵒᵖ M))
+  TauCeti.objectCode (ModuleCat.FiniteProjective.repr Rᵐᵒᵖ M)
 
 /-- Two classes, including inputs in different carrier universes, are equal
 exactly when the right modules are linearly equivalent. -/
 theorem of_eq_iff (N : Type w) [AddCommGroup N] [Module Rᵐᵒᵖ N]
     [Module.Finite Rᵐᵒᵖ N] [Module.Projective Rᵐᵒᵖ N] :
     of R M = of R N ↔ Nonempty (M ≃ₗ[Rᵐᵒᵖ] N) := by
-  unfold of
-  rw [(classEquiv R).symm.injective.eq_iff, Additive.ofMul.injective.eq_iff]
-  exact ModuleCat.FiniteProjective.isoClass_eq_iff Rᵐᵒᵖ M N
+  change TauCeti.objectCode (ModuleCat.FiniteProjective.repr Rᵐᵒᵖ M) =
+    TauCeti.objectCode (ModuleCat.FiniteProjective.repr Rᵐᵒᵖ N) ↔ _
+  exact ModuleCat.FiniteProjective.objectCode_repr_eq_iff Rᵐᵒᵖ M N
 
 /-- Linear equivalence preserves the direct-sum isomorphism class. -/
 theorem of_eq_of_equiv {N : Type w} [AddCommGroup N] [Module Rᵐᵒᵖ N]
@@ -172,35 +108,58 @@ theorem of_finite_repr :
 /-- A carrier lift does not change the isomorphism class. -/
 @[simp]
 theorem of_ulift : of R (ULift.{w} M) = of R M := by
-  unfold of
-  rw [ModuleCat.FiniteProjective.isoClass_ulift]
+  exact of_eq_of_equiv R _ ULift.moduleEquiv
 
 /-- The class of any zero module is the monoid zero, including over the zero ring. -/
 @[simp]
 theorem of_zero (Z : Type v) [AddCommGroup Z] [Module Rᵐᵒᵖ Z] [Subsingleton Z] :
     of R Z = 0 := by
-  apply (classEquiv R).injective
-  simp only [of, AddEquiv.apply_symm_apply, map_zero]
-  change ModuleCat.FiniteProjective.isoClass Rᵐᵒᵖ Z =
-    (1 : Skeleton (RightProjective R))
-  rw [ModuleCat.FiniteProjective.isoClass_zero, Skeleton.one_eq]
-  rfl
+  change TauCeti.objectCode (ModuleCat.FiniteProjective.repr Rᵐᵒᵖ Z) =
+    (0 : TauCeti.ObjectCode.{u} (ModuleCat.FiniteProjective.{u, u} Rᵐᵒᵖ))
+  rw [← TauCeti.objectCode_zero]
+  apply TauCeti.objectCode_congr
+  exact (ModuleCat.FiniteProjective.reprZeroIso Rᵐᵒᵖ Z).trans
+    (IsZero.isoZero (IsZero.of_full_of_faithful_of_isZero
+      (ModuleCat.isFiniteProjective Rᵐᵒᵖ).ι _
+      (ModuleCat.isZero_iff_subsingleton.mpr (by
+        change Subsingleton PUnit.{u + 1}
+        infer_instance))))
 
 /-- Binary direct sum of modules computes addition of isomorphism classes. -/
 @[simp]
 theorem of_prod (N : Type w) [AddCommGroup N] [Module Rᵐᵒᵖ N]
     [Module.Finite Rᵐᵒᵖ N] [Module.Projective Rᵐᵒᵖ N] :
     of R (M × N) = of R M + of R N := by
-  apply (classEquiv R).injective
-  simp only [of, AddEquiv.apply_symm_apply, map_add]
-  change toSkeleton (ModuleCat.FiniteProjective.repr Rᵐᵒᵖ (M × N)) =
-    toSkeleton (ModuleCat.FiniteProjective.repr Rᵐᵒᵖ M) *
-      toSkeleton (ModuleCat.FiniteProjective.repr Rᵐᵒᵖ N)
-  exact (congr_toSkeleton_of_iso
-    (ModuleCat.FiniteProjective.reprProdIso Rᵐᵒᵖ M N)).trans
-      (Skeleton.toSkeleton_tensorObj
-        (ModuleCat.FiniteProjective.repr Rᵐᵒᵖ M)
-        (ModuleCat.FiniteProjective.repr Rᵐᵒᵖ N))
+  change TauCeti.objectCode (ModuleCat.FiniteProjective.repr Rᵐᵒᵖ (M × N)) =
+    (TauCeti.objectCode (ModuleCat.FiniteProjective.repr Rᵐᵒᵖ M) +
+      TauCeti.objectCode (ModuleCat.FiniteProjective.repr Rᵐᵒᵖ N) :
+        TauCeti.ObjectCode.{u} (ModuleCat.FiniteProjective.{u, u} Rᵐᵒᵖ))
+  rw [← TauCeti.objectCode_biprod]
+  apply TauCeti.objectCode_congr
+  refine (ModuleCat.FiniteProjective.reprProdIso Rᵐᵒᵖ M N).trans ?_
+  let X := ModuleCat.FiniteProjective.repr Rᵐᵒᵖ M
+  let Y := ModuleCat.FiniteProjective.repr Rᵐᵒᵖ N
+  let cone : BinaryFan X Y := BinaryFan.mk
+    ((ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ
+      (ModuleCat.FiniteProjective.of Rᵐᵒᵖ (X × Y)) X).symm (LinearMap.fst Rᵐᵒᵖ X Y))
+    ((ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ
+      (ModuleCat.FiniteProjective.of Rᵐᵒᵖ (X × Y)) Y).symm (LinearMap.snd Rᵐᵒᵖ X Y))
+  let hcone : IsLimit cone := BinaryFan.IsLimit.mk _
+    (fun {T} f g ↦ (ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ T _).symm
+      ((ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ T X f).prod
+        (ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ T Y g)))
+    (fun _ _ ↦ by apply ModuleCat.FiniteProjective.hom_ext; rfl)
+    (fun _ _ ↦ by apply ModuleCat.FiniteProjective.hom_ext; rfl)
+    (fun {T} f g m hf hg ↦ by
+      apply ModuleCat.FiniteProjective.hom_ext
+      apply LinearMap.ext
+      intro x
+      exact Prod.ext
+        (congrArg (fun h : T ⟶ X ↦
+          ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ T X h x) hf)
+        (congrArg (fun h : T ⟶ Y ↦
+          ModuleCat.FiniteProjective.homLinearEquiv Rᵐᵒᵖ T Y h x) hg))
+  exact hcone.conePointUniqueUpToIso (BinaryBiproduct.isLimit X Y)
 
 /-- The finite coordinate module has the class of `n` copies of the regular
 right module, for arbitrary rings. -/
@@ -221,10 +180,8 @@ theorem of_fin_fun_eq_nsmul (n : ℕ) :
 theorem of_surjective :
     Function.Surjective (fun X : ModuleCat.FiniteProjective.{u, u} Rᵐᵒᵖ ↦ of R X) := by
   intro a
-  refine ⟨(fromSkeleton (RightProjective R)).obj ((classEquiv R a).toMul), ?_⟩
-  apply (classEquiv R).injective
-  simp only [of, AddEquiv.apply_symm_apply, ModuleCat.FiniteProjective.isoClass_of,
-    toSkeleton_fromSkeleton_obj, ofMul_toMul]
+  obtain ⟨X, rfl⟩ := TauCeti.objectCode_surjective a
+  exact ⟨X, TauCeti.objectCode_congr (ModuleCat.FiniteProjective.reprIso Rᵐᵒᵖ X)⟩
 
 /-- To prove a proposition about a class, it suffices to prove it on classes
 of modules in the ring-universe reference category. -/
@@ -253,16 +210,19 @@ variable {A : Type w}
 /-- Descend an isomorphism-invariant function on finite projective right modules
 to a function on their isomorphism classes, with no algebraic structure on the target. -/
 @[no_expose]
-noncomputable def liftFunction : ProjectiveClass R → A :=
-  fun a ↦ Quotient.lift (s := isIsomorphicSetoid (RightProjective R)) f
-    (fun _ _ e ↦ hiso (Classical.choice e)) ((classEquiv R a).toMul)
+noncomputable def liftFunction
+    (_hiso : ∀ {X Y : ModuleCat.FiniteProjective.{u, u} Rᵐᵒᵖ}, (X ≅ Y) → f X = f Y) :
+    ProjectiveClass R → A :=
+  fun a ↦ f (Function.surjInv TauCeti.objectCode_surjective a)
 
 /-- The descended function evaluates on a reference-module class as the supplied function. -/
 @[simp]
 theorem liftFunction_of (X : ModuleCat.FiniteProjective.{u, u} Rᵐᵒᵖ) :
     liftFunction R f hiso (of R X) = f X := by
-  simp only [liftFunction, of, AddEquiv.apply_symm_apply, toMul_ofMul,
-    ModuleCat.FiniteProjective.isoClass_of, Quotient.lift_mk]
+  apply hiso
+  exact (TauCeti.objectCode_eq_objectCode_iff.1
+    ((Function.surjInv_eq TauCeti.objectCode_surjective _).trans
+      (TauCeti.objectCode_congr (ModuleCat.FiniteProjective.reprIso Rᵐᵒᵖ X)))).some
 
 /-- For an input in any carrier universe, the descended function evaluates the
 supplied function on its ring-universe representative. -/
@@ -347,6 +307,13 @@ abbrev K0 : Type u := Algebra.GrothendieckAddGroup (ProjectiveClass R)
 
 namespace K0
 
+/-- The canonical comparison with Tau Ceti's split Grothendieck group of finite
+projective right modules. -/
+noncomputable def splitK0Equiv :
+    K0 R ≃+ TauCeti.SplitK0.{u} (TauCeti.finiteProjectiveModules Rᵐᵒᵖ).FullSubcategory :=
+  (TauCeti.SplitK0.grothendieckAddGroupEquiv.{u} _).trans
+    (TauCeti.SplitK0.mapEquiv.{u, u} (ModuleCat.FiniteProjective.tauCetiEquivalence Rᵐᵒᵖ))
+
 /-- The canonical additive map from direct-sum isomorphism classes to K₀.
 It is not asserted to be injective. -/
 noncomputable abbrev ofClass : ProjectiveClass R →+ K0 R :=
@@ -358,6 +325,18 @@ variable (M : Type v) [AddCommGroup M] [Module Rᵐᵒᵖ M]
 /-- The K₀ generator associated to a finite projective right module in any
 carrier universe. -/
 noncomputable def of : K0 R := ofClass R (ProjectiveClass.of R M)
+
+/-- The comparison sends a module generator to the split class of its
+ring-universe representative, retaining the original right scalar action. -/
+theorem splitK0Equiv_of :
+    splitK0Equiv R (of R M) =
+      TauCeti.SplitK0.of.{u} ((ModuleCat.FiniteProjective.tauCetiEquivalence Rᵐᵒᵖ).functor.obj
+        (ModuleCat.FiniteProjective.repr Rᵐᵒᵖ M)) := by
+  change TauCeti.SplitK0.mapEquiv.{u, u} _
+    (TauCeti.SplitK0.grothendieckAddGroupEquiv.{u} _
+      (Algebra.GrothendieckAddGroup.of (TauCeti.objectCode _))) = _
+  rw [TauCeti.SplitK0.grothendieckAddGroupEquiv_of_objectCode,
+    TauCeti.SplitK0.mapEquiv_of]
 
 /-- The canonical completion map sends a module's isomorphism class to its K₀ generator. -/
 theorem ofClass_of : ofClass R (ProjectiveClass.of R M) = of R M := rfl

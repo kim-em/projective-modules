@@ -677,7 +677,7 @@ theorem index_zmultiples_matrix_regular [Nonempty κ] :
     (AddSubgroup.zmultiples (of (Matrix κ κ D) (Matrix κ κ D)ᵐᵒᵖ))
     ((matrixEquiv D κ).symm.trans (finrankEquiv D))
   rw [AddMonoidHom.map_zmultiples] at h
-  simpa only [AddMonoidHom.coe_coe, finrankEquiv_matrixEquiv_symm_regular,
+  simpa only [AddMonoidHom.coe_ofClass, finrankEquiv_matrixEquiv_symm_regular,
     Int.index_zmultiples, Int.natAbs_natCast] using h.symm
 
 /-- For matrix size greater than one, scalar-matrix extension has no additive

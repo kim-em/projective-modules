@@ -6,7 +6,7 @@ Authors: Formal Frontier Agents
 -- Contributors: Prism, Lens
 module
 
-public import ProjectiveModules.Module.BalancedTensorProduct
+public import ProjectiveModules.Module.BalancedTensorAdditive
 public import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 public import Mathlib.Algebra.Module.Projective
 public import Mathlib.LinearAlgebra.Prod
@@ -25,6 +25,8 @@ equivalences and commutes with binary products.
 -/
 
 @[expose] public section
+
+open TauCeti
 
 universe uR uS uT uM uN
 
@@ -48,7 +50,7 @@ theorem smulCommClass (f : R →+* S) :
 /-- Extension of a right module along a homomorphism of arbitrary rings. -/
 abbrev Obj (f : R →+* S) (M : Type uM) [AddCommGroup M] [Module Rᵐᵒᵖ M] :
     Type (max uM uS) :=
-  @BalancedTensorProduct R M S _ _ _ _ f.toModule
+  @TauCeti.BalancedTensorProduct ℤ R M S _ _ _ _ _ _ _ f.toModule
 
 variable (f : R →+* S)
 
@@ -63,40 +65,40 @@ instance : AddCommGroup (Obj f M) := by
 instance : Module Sᵐᵒᵖ (Obj f M) := by
   letI : Module R S := f.toModule
   let _ : SMulCommClass R Sᵐᵒᵖ S := smulCommClass f
-  infer_instance
+  exact BalancedTensorProduct.rightModule (k := ℤ) (A := R) Sᵐᵒᵖ
 
 /-- The canonical pure tensor in a right-module extension of scalars. -/
 def tmul (m : M) (s : S) : Obj f M := by
   letI : Module R S := f.toModule
-  exact BalancedTensorProduct.tmul m s
+  exact BalancedTensorProduct.tmul ℤ _ m s
 
 @[simp]
 theorem tmul_smul (m : M) (s : S) (t : Sᵐᵒᵖ) :
     t • tmul f m s = tmul f m (t • s) := by
   let _ : Module R S := f.toModule
   let _ : SMulCommClass R Sᵐᵒᵖ S := smulCommClass f
-  exact BalancedTensorProduct.smul_tmul_right t m s
+  exact BalancedTensorProduct.smul_tmul_right Sᵐᵒᵖ t m s
 
 @[simp]
 theorem smul_tmul (r : R) (m : M) (s : S) :
     tmul f (MulOpposite.op r • m) s = tmul f m (f r * s) := by
   let _ : Module R S := f.toModule
-  exact BalancedTensorProduct.smul_tmul r m s
+  exact BalancedTensorProduct.balance ℤ R r m s
 
 /-- The additive homomorphism underlying scalar extension of a morphism. This
 is an implementation detail of `ModuleCat.RightExtension.map`. -/
 def mapAddHom (g : M →ₗ[Rᵐᵒᵖ] N) : Obj f M →+ Obj f N := by
   letI : Module R S := f.toModule
-  apply BalancedTensorProduct.lift
+  apply BalancedTensorProduct.liftAddHom
   exact
     { toFun := fun m s => tmul f (g m) s
       map_zero_left := fun s => by simp [tmul]
-      map_add_left := fun m₁ m₂ s => by simp [tmul, map_add, BalancedTensorProduct.add_tmul]
+      map_add_left := fun m₁ m₂ s => by simp [tmul, map_add, BalancedTensorProduct.add_tmul ℤ _]
       map_zero_right := fun m => by simp [tmul]
-      map_add_right := fun m s₁ s₂ => by simp [tmul, BalancedTensorProduct.tmul_add]
+      map_add_right := fun m s₁ s₂ => by simp [tmul, BalancedTensorProduct.tmul_add ℤ _]
       balance := fun r m s => by
         rw [g.map_smul]
-        exact BalancedTensorProduct.smul_tmul r (g m) s }
+        exact BalancedTensorProduct.balance ℤ R r (g m) s }
 
 /-- Extension of scalars on a morphism of right modules. -/
 def map (g : M →ₗ[Rᵐᵒᵖ] N) : Obj f M →ₗ[Sᵐᵒᵖ] Obj f N where
@@ -105,12 +107,12 @@ def map (g : M →ₗ[Rᵐᵒᵖ] N) : Obj f M →ₗ[Sᵐᵒᵖ] Obj f N where
     let _ : Module R S := f.toModule
     let _ : SMulCommClass R Sᵐᵒᵖ S := smulCommClass f
     exact DFunLike.congr_fun
-      (BalancedTensorProduct.hom_ext (R := R) (M := M) (N := S)
-        (g := (mapAddHom (f := f) g).comp (BalancedTensorProduct.smulAddHom t))
-        (h := (BalancedTensorProduct.smulAddHom t).comp (mapAddHom (f := f) g))
+      (BalancedTensorProduct.addHom_ext (R := R) (M := M) (N := S)
+        (g := (mapAddHom (f := f) g).comp ((DistribSMul.toLinearMap ℤ _ t).toAddMonoidHom))
+        (h := ((DistribSMul.toLinearMap ℤ _ t).toAddMonoidHom).comp (mapAddHom (f := f) g))
         fun m s => by
-          simp [mapAddHom, tmul, BalancedTensorProduct.smulAddHom,
-            BalancedTensorProduct.smulBalancedMap]) x
+          simp [mapAddHom, tmul, DistribSMul.toLinearMap_apply,
+            BalancedTensorProduct.smul_tmul_right]) x
 
 @[simp]
 theorem map_tmul (g : M →ₗ[Rᵐᵒᵖ] N) (m : M) (s : S) :
@@ -127,7 +129,7 @@ theorem linearMap_ext {X : Type*} [AddCommGroup X] [Module Sᵐᵒᵖ X]
   intro x
   let _ : Module R S := f.toModule
   exact DFunLike.congr_fun
-    (BalancedTensorProduct.hom_ext (R := R) (M := M) (N := S)
+    (BalancedTensorProduct.addHom_ext (R := R) (M := M) (N := S)
       (g := g.toAddMonoidHom) (h := h.toAddMonoidHom) H) x
 
 /-- Two additive maps from an iterated right extension are equal if they agree
@@ -141,14 +143,14 @@ theorem addHom_ext_tmul_tmul {T : Type uT} [Ring T]
     g = h := by
   let _ : Module S T := ψ.toModule
   let _ : Module R S := φ.toModule
-  apply BalancedTensorProduct.hom_ext (R := S) (M := Obj φ M) (N := T)
+  apply BalancedTensorProduct.addHom_ext (R := S) (M := Obj φ M) (N := T)
   intro z t
   let tmulAddHom : Obj φ M →+ Obj ψ (Obj φ M) :=
     { toFun := fun x => tmul ψ x t
-      map_zero' := BalancedTensorProduct.zero_tmul t
-      map_add' := fun x y => BalancedTensorProduct.add_tmul x y t }
+      map_zero' := BalancedTensorProduct.zero_tmul ℤ _ t
+      map_add' := fun x y => BalancedTensorProduct.add_tmul ℤ _ x y t }
   exact DFunLike.congr_fun
-    (BalancedTensorProduct.hom_ext (R := R) (M := M) (N := S)
+    (BalancedTensorProduct.addHom_ext (R := R) (M := M) (N := S)
       (g := g.comp tmulAddHom) (h := h.comp tmulAddHom) fun m s => H m s t) z
 
 /-- Two right-linear maps from an iterated right extension are equal if they
@@ -184,7 +186,7 @@ theorem map_add (g h : M →ₗ[Rᵐᵒᵖ] N) : map f (g + h) = map f g + map f
   intro m s
   simp only [LinearMap.add_apply, map_tmul]
   let _ : Module R S := f.toModule
-  exact BalancedTensorProduct.add_tmul (g m) (h m) s
+  exact BalancedTensorProduct.add_tmul ℤ _ (g m) (h m) s
 
 /-- Extension of scalars along a homomorphism of arbitrary rings, as a functor
 between categories of right modules. The target carrier universe includes the
@@ -247,9 +249,9 @@ def toSemilinear (g : Obj f M →ₗ[Sᵐᵒᵖ] X) : M →ₛₗ[RingHom.op f] 
   map_add' m n := by
     let _ : Module R S := f.toModule
     have h : tmul f (m + n) 1 = tmul f m 1 + tmul f n 1 := by
-      change BalancedTensorProduct.tmul (m + n) 1 =
-        BalancedTensorProduct.tmul m 1 + BalancedTensorProduct.tmul n 1
-      exact BalancedTensorProduct.add_tmul m n 1
+      change BalancedTensorProduct.tmul ℤ _ (m + n) 1 =
+        BalancedTensorProduct.tmul ℤ _ m 1 + BalancedTensorProduct.tmul ℤ _ n 1
+      exact BalancedTensorProduct.add_tmul ℤ _ m n 1
     rw [h, g.map_add]
   map_smul' r m := by
     change g (tmul f (r • m) 1) = (RingHom.op f r) • g (tmul f m 1)
@@ -278,16 +280,12 @@ theorem tmulOne_surjective (hf : Function.Surjective f) :
     Function.Surjective (tmulOne f : M → Obj f M) := by
   intro x
   induction x using BalancedTensorProduct.induction_on with
-  | zero => exact ⟨0, (tmulOne f).map_zero⟩
-  | pure m s =>
+  | ht m s =>
       obtain ⟨r, rfl⟩ := hf s
       refine ⟨MulOpposite.op r • m, ?_⟩
       rw [tmulOne_apply, smul_tmul, mul_one]
       rfl
-  | neg x hx =>
-      obtain ⟨m, rfl⟩ := hx
-      exact ⟨-m, (tmulOne f).map_neg m⟩
-  | add x y hx hy =>
+  | ha x y hx hy =>
       obtain ⟨m, rfl⟩ := hx
       obtain ⟨n, rfl⟩ := hy
       exact ⟨m + n, (tmulOne f).map_add m n⟩
@@ -330,7 +328,7 @@ theorem map_surjective_of_surjective [Module.Projective Rᵐᵒᵖ M]
 right module. This is an implementation detail of `fromSemilinear`. -/
 def fromSemilinearAddHom (h : M →ₛₗ[RingHom.op f] X) : Obj f M →+ X := by
   letI : Module R S := f.toModule
-  apply BalancedTensorProduct.lift
+  apply BalancedTensorProduct.liftAddHom
   exact
     { toFun := fun m s => MulOpposite.op s • h m
       map_zero_left := fun s => by rw [h.map_zero, smul_zero]
@@ -354,27 +352,27 @@ def fromSemilinear (h : M →ₛₗ[RingHom.op f] X) : Obj f M →ₗ[Sᵐᵒᵖ
     let _ : Module R S := f.toModule
     let _ : SMulCommClass R Sᵐᵒᵖ S := smulCommClass f
     let lhs : Obj f M →+ X :=
-      (fromSemilinearAddHom f h).comp (BalancedTensorProduct.smulAddHom t)
+      (fromSemilinearAddHom f h).comp ((DistribSMul.toLinearMap ℤ _ t).toAddMonoidHom)
     let rhs : Obj f M →+ X :=
       { toFun := fun z => t • fromSemilinearAddHom f h z
         map_zero' := by rw [(fromSemilinearAddHom f h).map_zero, smul_zero]
         map_add' := fun a b => by rw [(fromSemilinearAddHom f h).map_add, smul_add] }
     exact DFunLike.congr_fun
-      (BalancedTensorProduct.hom_ext (R := R) (M := M) (N := S)
+      (BalancedTensorProduct.addHom_ext (R := R) (M := M) (N := S)
         (g := lhs) (h := rhs) fun m s => by
           change fromSemilinearAddHom f h
-              (BalancedTensorProduct.smulAddHom t (BalancedTensorProduct.tmul m s)) =
-            t • fromSemilinearAddHom f h (BalancedTensorProduct.tmul m s)
-          simp only [fromSemilinearAddHom, BalancedTensorProduct.smulAddHom,
-            BalancedTensorProduct.lift_tmul, BalancedTensorProduct.smulBalancedMap]
+              ((DistribSMul.toLinearMap ℤ _) t (BalancedTensorProduct.tmul ℤ _ m s)) =
+            t • fromSemilinearAddHom f h (BalancedTensorProduct.tmul ℤ _ m s)
+          simp only [fromSemilinearAddHom, DistribSMul.toLinearMap_apply,
+            BalancedTensorProduct.liftAddHom_tmul, BalancedTensorProduct.smul_tmul_right]
           exact mul_smul t (MulOpposite.op s) (h m)) x
 
 @[simp]
 theorem fromSemilinear_tmul (h : M →ₛₗ[RingHom.op f] X) (m : M) (s : S) :
     fromSemilinear f h (tmul f m s) = MulOpposite.op s • h m := by
   let _ : Module R S := f.toModule
-  change BalancedTensorProduct.lift _ (BalancedTensorProduct.tmul (R := R) m s) = _
-  rw [BalancedTensorProduct.lift_tmul]
+  change BalancedTensorProduct.liftAddHom _ (BalancedTensorProduct.tmul ℤ R m s) = _
+  rw [BalancedTensorProduct.liftAddHom_tmul]
 
 /-- The extension/restriction correspondence for linear and semilinear maps
 over arbitrary, possibly noncommutative rings. -/
@@ -425,9 +423,9 @@ noncomputable def toRestriction (g : (functor f).obj M' ⟶ X) :
         change g.hom (tmul f (m + n) 1) = g.hom (tmul f m 1) + g.hom (tmul f n 1)
         let _ : Module R S := f.toModule
         have h : tmul f (m + n) 1 = tmul f m 1 + tmul f n 1 := by
-          change BalancedTensorProduct.tmul (m + n) 1 =
-            BalancedTensorProduct.tmul m 1 + BalancedTensorProduct.tmul n 1
-          exact BalancedTensorProduct.add_tmul m n 1
+          change BalancedTensorProduct.tmul ℤ _ (m + n) 1 =
+            BalancedTensorProduct.tmul ℤ _ m 1 + BalancedTensorProduct.tmul ℤ _ n 1
+          exact BalancedTensorProduct.add_tmul ℤ _ m n 1
         rw [h, g.hom.map_add]
       map_smul' := fun r m => by
         change g.hom (tmul f (r • m) 1) = (RingHom.op f r) • g.hom (tmul f m 1)
@@ -447,7 +445,7 @@ noncomputable def fromRestrictionAddHom
     (h : M' ⟶ (ModuleCat.restrictScalars.{max uM uS} (RingHom.op f)).obj X) :
     Obj f M' →+ X := by
   letI : Module R S := f.toModule
-  apply BalancedTensorProduct.lift
+  apply BalancedTensorProduct.liftAddHom
   exact
     { toFun := fun m s => MulOpposite.op s • h m
       map_zero_left := fun s => by
@@ -481,7 +479,7 @@ noncomputable def fromRestriction
         let _ : SMulCommClass R Sᵐᵒᵖ S := smulCommClass f
         let lhs : Obj f M' →+ X :=
           (fromRestrictionAddHom f M' X h).comp
-            (BalancedTensorProduct.smulAddHom t)
+            ((DistribSMul.toLinearMap ℤ _ t).toAddMonoidHom)
         let rhs : Obj f M' →+ X :=
           { toFun := fun z => t • fromRestrictionAddHom f M' X h z
             map_zero' := by
@@ -489,10 +487,10 @@ noncomputable def fromRestriction
             map_add' := fun a b => by
               rw [(fromRestrictionAddHom f M' X h).map_add, smul_add] }
         exact DFunLike.congr_fun
-          (BalancedTensorProduct.hom_ext (R := R) (M := M') (N := S)
+          (BalancedTensorProduct.addHom_ext (R := R) (M := M') (N := S)
             (g := lhs) (h := rhs) fun m s => by
-              simp [lhs, rhs, fromRestrictionAddHom, BalancedTensorProduct.smulAddHom,
-                BalancedTensorProduct.smulBalancedMap, mul_smul]
+              simp [lhs, rhs, fromRestrictionAddHom, DistribSMul.toLinearMap_apply,
+                BalancedTensorProduct.smul_tmul_right, mul_smul]
               rfl) x }
 
 @[simp]
@@ -501,8 +499,8 @@ theorem fromRestriction_tmul
     (m : M') (s : S) :
     fromRestriction f M' X h (tmul f m s) = MulOpposite.op s • h m := by
   let _ : Module R S := f.toModule
-  change BalancedTensorProduct.lift _ (BalancedTensorProduct.tmul m s) = _
-  rw [BalancedTensorProduct.lift_tmul]
+  change BalancedTensorProduct.liftAddHom _ (BalancedTensorProduct.tmul ℤ _ m s) = _
+  rw [BalancedTensorProduct.liftAddHom_tmul]
 
 /-- The extension/restriction adjunction for right modules over arbitrary
 possibly noncommutative rings. -/
@@ -541,8 +539,8 @@ noncomputable def adjunction :
         apply linearMap_ext f
         intro m s
         change HomEquiv.fromRestriction f M₁ X (g ≫ h) (tmul f m s) =
-          HomEquiv.fromRestriction f M₂ X h (tmul f (g m) s)
-        rw [HomEquiv.fromRestriction_tmul, HomEquiv.fromRestriction_tmul]
+          HomEquiv.fromRestriction f M₂ X h (map f g.hom (tmul f m s))
+        rw [map_tmul, HomEquiv.fromRestriction_tmul, HomEquiv.fromRestriction_tmul]
         rfl
       homEquiv_naturality_right := fun {M' X Y} g h => by
         apply ModuleCat.hom_ext
@@ -594,16 +592,16 @@ instance instFinite [Module.Finite Rᵐᵒᵖ M] : Module.Finite Sᵐᵒᵖ (Obj
         change tmul f (0 : M) 1 ∈ Q
         let _ : Module R S := f.toModule
         rw [show tmul f (0 : M) 1 = 0 by
-          change BalancedTensorProduct.tmul (0 : M) 1 = 0
-          exact BalancedTensorProduct.zero_tmul 1]
+          change BalancedTensorProduct.tmul ℤ _ (0 : M) 1 = 0
+          exact BalancedTensorProduct.zero_tmul ℤ _ 1]
         exact Q.zero_mem
       add_mem' := fun {m n} hm hn => by
         change tmul f (m + n) 1 ∈ Q
         let _ : Module R S := f.toModule
         rw [show tmul f (m + n) 1 = tmul f m 1 + tmul f n 1 by
-          change BalancedTensorProduct.tmul (m + n) 1 =
-            BalancedTensorProduct.tmul m 1 + BalancedTensorProduct.tmul n 1
-          exact BalancedTensorProduct.add_tmul m n 1]
+          change BalancedTensorProduct.tmul ℤ _ (m + n) 1 =
+            BalancedTensorProduct.tmul ℤ _ m 1 + BalancedTensorProduct.tmul ℤ _ n 1
+          exact BalancedTensorProduct.add_tmul ℤ _ m n 1]
         exact Q.add_mem hm hn
       smul_mem' := fun r m hm => by
         change tmul f (MulOpposite.op (MulOpposite.unop r) • m) 1 ∈ Q
@@ -648,8 +646,8 @@ theorem map_zero : map f (0 : M →ₗ[Rᵐᵒᵖ] N) = 0 := by
   intro m s
   rw [map_tmul]
   let _ : Module R S := f.toModule
-  change BalancedTensorProduct.tmul (R := R) (0 : N) s = 0
-  exact BalancedTensorProduct.zero_tmul s
+  change BalancedTensorProduct.tmul ℤ R (0 : N) s = 0
+  exact BalancedTensorProduct.zero_tmul ℤ _ s
 
 /-- Extension of scalars carries a right-linear equivalence to a
 right-linear equivalence. -/
@@ -709,16 +707,16 @@ def prodLinearEquiv :
     simp only [map_tmul, LinearMap.fst_apply, LinearMap.snd_apply,
       LinearMap.inl_apply, LinearMap.inr_apply]
     let _ : Module R S := f.toModule
-    change BalancedTensorProduct.tmul (R := R) (m, 0) s +
-        BalancedTensorProduct.tmul (R := R) (0, n) s =
-      BalancedTensorProduct.tmul (R := R) (m, n) s
-    rw [← BalancedTensorProduct.add_tmul]
+    change BalancedTensorProduct.tmul ℤ R (m, 0) s +
+        BalancedTensorProduct.tmul ℤ R (0, n) s =
+      BalancedTensorProduct.tmul ℤ R (m, n) s
+    rw [← BalancedTensorProduct.add_tmul ℤ _]
     simp
 
 @[simp]
 theorem prodLinearEquiv_tmul (m : M) (n : N) (s : S) :
     prodLinearEquiv (f := f) (M := M) (N := N) (tmul f (m, n) s) =
       (tmul f m s, tmul f n s) := by
-  rfl
+  simp [prodLinearEquiv]
 
 end ModuleCat.RightExtension

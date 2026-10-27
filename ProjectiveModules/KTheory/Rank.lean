@@ -8,7 +8,7 @@ public import ProjectiveModules.KTheory.K0
 public import ProjectiveModules.KTheory.Ring
 public import ProjectiveModules.KTheory.ScalarExtension
 public import ProjectiveModules.Module.LocalRing
-public import ProjectiveModules.Module.PID
+public import TauCeti.LinearAlgebra.FreeModule.PID
 public import ProjectiveModules.Module.RightExtensionFree
 public import Mathlib.Algebra.Field.Opposite
 public import Mathlib.Algebra.Ring.Equiv
@@ -567,7 +567,8 @@ end ProjectiveFreeScalarExtension
 The residue construction below uses Mathlib's standard ideal quotient and its
 division-ring structure, with the canonical Jacobson maximality theorem from
 `StableRange.Local`. Finite-projective freeness is provided by
-`Module.Projective.free_of_isLocalRing` and `Module.Projective.free_of_pid` in
+`Module.Projective.free_of_isLocalRing` and
+`Module.Free.of_injective_of_projective_of_isPrincipalIdealRing` in
 this library; applying these to opposite scalars gives the right-module inputs.
 The PID calculation uses Mathlib's existing fraction field, with no new rank
 or group-completion construction.
@@ -681,7 +682,8 @@ theorem pidDimension_bijective :
   have hmap : Function.Bijective (map (algebraMap R (FractionRing R))) :=
     map_bijective_of_projectiveClass_map_bijective _
       (ProjectiveClass.map_bijective_of_projective_free _ fun X ↦
-        Module.Projective.free_of_pid Rᵐᵒᵖ X)
+        Module.Free.of_injective_of_projective_of_isPrincipalIdealRing
+          (LinearMap.id : X →ₗ[Rᵐᵒᵖ] X) Function.injective_id)
   have hdimension : Function.Bijective (finrankHom (FractionRing R)) := by
     rw [← finrankEquiv_toAddMonoidHom]
     exact (finrankEquiv (FractionRing R)).bijective
@@ -751,7 +753,8 @@ integers, to that multiple of the regular right-module generator. -/
 theorem localEquivInt_symm_apply (z : ℤ) :
     (localEquivInt R).symm z = z • of R Rᵐᵒᵖ := by
   apply (localEquivInt R).injective
-  rw [AddEquiv.apply_symm_apply, map_zsmul, localEquivInt_of_self]
+  rw [AddEquiv.apply_symm_apply, localEquivInt_apply, map_zsmul,
+    localDimensionHom_of_self]
   simp
 
 /-- The inverse local K₀ equivalence sends one to the regular right-module
@@ -812,7 +815,8 @@ theorem pidEquivInt_of_module_finrank (M : Type v) [AddCommGroup M]
   let : IsPrincipalIdealRing Rᵐᵒᵖ :=
     IsPrincipalIdealRing.of_surjective (RingEquiv.toOpposite R).toRingHom
       (RingEquiv.toOpposite R).surjective
-  let : Module.Free Rᵐᵒᵖ M := Module.Projective.free_of_pid Rᵐᵒᵖ M
+  let : Module.Free Rᵐᵒᵖ M := Module.Free.of_injective_of_projective_of_isPrincipalIdealRing
+    (LinearMap.id : M →ₗ[Rᵐᵒᵖ] M) Function.injective_id
   let e : M ≃ₗ[Rᵐᵒᵖ] (Fin (Module.finrank Rᵐᵒᵖ M) → R) :=
     (Module.finBasis Rᵐᵒᵖ M).equivFun.trans (Module.rightFreeCoordEquiv R _)
   let eF :
@@ -832,7 +836,11 @@ integers, to that multiple of the regular right-module generator. -/
 theorem pidEquivInt_symm_apply (z : ℤ) :
     (pidEquivInt R).symm z = z • of R Rᵐᵒᵖ := by
   apply (pidEquivInt R).injective
-  rw [AddEquiv.apply_symm_apply, map_zsmul, pidEquivInt_of_self]
+  rw [AddEquiv.apply_symm_apply]
+  change z = (pidEquivInt R).toAddMonoidHom (z • of R Rᵐᵒᵖ)
+  rw [AddMonoidHom.map_zsmul]
+  change z = z • pidEquivInt R (of R Rᵐᵒᵖ)
+  rw [pidEquivInt_of_self]
   simp
 
 /-- The inverse PID K₀ equivalence sends one to the regular right-module

@@ -177,12 +177,12 @@ private theorem ringEquiv_row_end :
 chosen from the proved Wedderburn–Artin theorem, not from a classification
 proposition or from an identity-only decomposition. -/
 private theorem first_block_semisimple_classification :
-    ∃! i : Fin (MatrixDivisionDecomposition.ofIsSemisimpleRing A).size, Nonempty
+    ∃! i : Fin (TauCeti.IsSemisimpleRing.wedderburnPresentation A).blockCount, Nonempty
       (firstBlockModule ≃ₗ[Aᵐᵒᵖ] matrixBlockModuleOfRingEquiv
-        (MatrixDivisionDecomposition.ofIsSemisimpleRing A).coefficient
-        (fun j ↦ Fin ((MatrixDivisionDecomposition.ofIsSemisimpleRing A).blockSize j))
-        (MatrixDivisionDecomposition.ofIsSemisimpleRing A).ringEquiv i) := by
-  exact (IsSemisimpleRing.matrixDivisionDecomposition_simple_basis A).2.1
+        (TauCeti.IsSemisimpleRing.wedderburnPresentation A).divisionRing
+        (fun j ↦ Fin ((TauCeti.IsSemisimpleRing.wedderburnPresentation A).degree j))
+        (TauCeti.IsSemisimpleRing.wedderburnPresentation A).equiv i) := by
+  exact (IsSemisimpleRing.wedderburnPresentation_simple_basis A).2.1
     firstBlockModule firstBlockModule_simple
 
 /-- The regular module over an empty coefficient product gives zero in both

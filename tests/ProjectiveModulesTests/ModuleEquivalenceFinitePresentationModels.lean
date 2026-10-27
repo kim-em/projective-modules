@@ -40,7 +40,7 @@ empty module carrier, since every module has a zero element.
   generated relations, and the Noetherian and finite-projective criteria.
 * `Mathlib.Algebra.Module.Projective`: the projective lifting property.
 * `ProjectiveModules.Module.LocallyConstantRank`: the idempotent-ideal criteria
-  `IsIdempotentElem.projective_span` and `IsIdempotentElem.not_free_span`.
+  `IsIdempotentElem.projective_span_singleton` and `IsIdempotentElem.not_free_span`.
 * `Mathlib.RingTheory.Finiteness.Cardinality`: finiteness of the index of a basis
   of a finitely generated module over a nontrivial ring.
 -/
@@ -85,12 +85,12 @@ private theorem firstCoordinate_idempotent :
 
 example : Module.Projective (ℤ × ℤ)
     (Ideal.span {((1, 0) : ℤ × ℤ)}) :=
-  firstCoordinate_idempotent.projective_span
+  firstCoordinate_idempotent.projective_span_singleton
 
 example : Module.FinitePresentation (ℤ × ℤ)
     (Ideal.span {((1, 0) : ℤ × ℤ)}) := by
   have : Module.Projective (ℤ × ℤ) (Ideal.span {((1, 0) : ℤ × ℤ)}) :=
-    firstCoordinate_idempotent.projective_span
+    firstCoordinate_idempotent.projective_span_singleton
   have : Module.Finite (ℤ × ℤ) (Ideal.span {((1, 0) : ℤ × ℤ)}) :=
     Module.Finite.of_fg (Submodule.fg_span_singleton ((1, 0) : ℤ × ℤ))
   exact Module.finitePresentation_of_projective _ _

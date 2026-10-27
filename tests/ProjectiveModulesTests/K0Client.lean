@@ -196,14 +196,14 @@ private noncomputable def firstSummand : FiniteProjective.{max u v, max u v} (K 
   letI : Module.Finite (K × L)ᵐᵒᵖ (Ideal.span {productIdempotent K L}) :=
     Module.Finite.span_singleton _ _
   letI : Module.Projective (K × L)ᵐᵒᵖ (Ideal.span {productIdempotent K L}) :=
-    (productIdempotent_isIdempotent K L).projective_span
+    (productIdempotent_isIdempotent K L).projective_span_singleton
   exact FiniteProjective.of (K × L)ᵐᵒᵖ (Ideal.span {productIdempotent K L})
 
 private noncomputable def secondSummand : FiniteProjective.{max u v, max u v} (K × L)ᵐᵒᵖ := by
   letI : Module.Finite (K × L)ᵐᵒᵖ (Ideal.span {1 - productIdempotent K L}) :=
     Module.Finite.span_singleton _ _
   letI : Module.Projective (K × L)ᵐᵒᵖ (Ideal.span {1 - productIdempotent K L}) :=
-    (productIdempotent_isIdempotent K L).one_sub.projective_span
+    (productIdempotent_isIdempotent K L).one_sub.projective_span_singleton
   exact FiniteProjective.of (K × L)ᵐᵒᵖ (Ideal.span {1 - productIdempotent K L})
 
 -- These are constructed finite projectives, not hypotheses supplied by the client.

@@ -148,7 +148,7 @@ private noncomputable def doubleDualExtensionEquiv
       normalizedRightDual Rᵐᵒᵖ (normalizedRightDual R X.obj) := by
   let D := normalizedRightDual R X.obj
   let b : X ≃ₗ[Rᵐᵒᵖ] (D →ₗ[Rᵐᵒᵖᵐᵒᵖ] Rᵐᵒᵖ) :=
-    (LinearMap.bidualEvalEquiv Rᵐᵒᵖ X).trans
+    (TauCeti.opDualEvalEquiv Rᵐᵒᵖ X).trans
       (LinearEquiv.congrLeft Rᵐᵒᵖ Rᵐᵒᵖ
         (ModuleCat.rightDualRestrictScalarsEquiv R X.obj).symm)
   let f : X →ₛₗ[RingHom.op (RingEquiv.opOp R).toRingHom]

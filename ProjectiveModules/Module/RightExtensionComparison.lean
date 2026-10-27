@@ -36,6 +36,8 @@ inverse laws.
 
 @[expose] public section
 
+open TauCeti
+
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
@@ -51,21 +53,21 @@ variable {M : Type uM} [AddCommGroup M] [Module Rᵐᵒᵖ M]
 
 private theorem tmul_zero_left (s : S) : tmul f (0 : M) s = 0 := by
   let _ : Module R S := f.toModule
-  exact BalancedTensorProduct.zero_tmul s
+  exact BalancedTensorProduct.zero_tmul ℤ _ s
 
 private theorem tmul_add_left (m n : M) (s : S) :
     tmul f (m + n) s = tmul f m s + tmul f n s := by
   let _ : Module R S := f.toModule
-  exact BalancedTensorProduct.add_tmul m n s
+  exact BalancedTensorProduct.add_tmul ℤ _ m n s
 
 private theorem tmul_zero_right (m : M) : tmul f m 0 = 0 := by
   let _ : Module R S := f.toModule
-  exact BalancedTensorProduct.tmul_zero m
+  exact BalancedTensorProduct.tmul_zero ℤ _ m
 
 private theorem tmul_add_right (m : M) (s t : S) :
     tmul f m (s + t) = tmul f m s + tmul f m t := by
   let _ : Module R S := f.toModule
-  exact BalancedTensorProduct.tmul_add m s t
+  exact BalancedTensorProduct.tmul_add ℤ _ m s t
 
 end PureTensors
 
@@ -139,7 +141,7 @@ variable {M : Type uM} [AddCommGroup M] [Module Rᵐᵒᵖ M]
 
 private def compToAddHom : Obj φ M →+ Obj (ψ.comp φ) M := by
   letI : Module R S := φ.toModule
-  apply BalancedTensorProduct.lift
+  apply BalancedTensorProduct.liftAddHom
   exact
     { toFun := fun m s => tmul (ψ.comp φ) m (ψ s)
       map_zero_left := fun s => tmul_zero_left (ψ.comp φ) (ψ s)
@@ -161,8 +163,8 @@ private def compToAddHom : Obj φ M →+ Obj (ψ.comp φ) M := by
 private theorem compToAddHom_tmul (m : M) (s : S) :
     compToAddHom φ ψ (tmul φ m s) = tmul (ψ.comp φ) m (ψ s) := by
   let _ : Module R S := φ.toModule
-  change BalancedTensorProduct.lift _ (BalancedTensorProduct.tmul m s) = _
-  exact BalancedTensorProduct.lift_tmul _ m s
+  change BalancedTensorProduct.liftAddHom _ (BalancedTensorProduct.tmul ℤ _ m s) = _
+  exact BalancedTensorProduct.liftAddHom_tmul _ m s
 
 private def compToSemilinear : Obj φ M →ₛₗ[RingHom.op ψ] Obj (ψ.comp φ) M where
   __ := compToAddHom φ ψ
@@ -170,13 +172,13 @@ private def compToSemilinear : Obj φ M →ₛₗ[RingHom.op ψ] Obj (ψ.comp φ
     let _ : Module R S := φ.toModule
     let _ : SMulCommClass R Sᵐᵒᵖ S := smulCommClass φ
     let lhs : Obj φ M →+ Obj (ψ.comp φ) M :=
-      (compToAddHom φ ψ).comp (BalancedTensorProduct.smulAddHom a)
+      (compToAddHom φ ψ).comp ((DistribSMul.toLinearMap ℤ _ a).toAddMonoidHom)
     let rhs : Obj φ M →+ Obj (ψ.comp φ) M :=
       { toFun := fun x => (RingHom.op ψ a) • compToAddHom φ ψ x
         map_zero' := by rw [(compToAddHom φ ψ).map_zero, smul_zero]
         map_add' := fun x y => by rw [(compToAddHom φ ψ).map_add, smul_add] }
     exact DFunLike.congr_fun
-      (BalancedTensorProduct.hom_ext (R := R) (M := M) (N := S)
+      (BalancedTensorProduct.addHom_ext (R := R) (M := M) (N := S)
         (g := lhs) (h := rhs) fun m s => by
           change compToAddHom φ ψ (a • tmul φ m s) =
             (RingHom.op ψ a) • compToAddHom φ ψ (tmul φ m s)

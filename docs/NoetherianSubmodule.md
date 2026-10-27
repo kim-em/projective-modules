@@ -47,8 +47,8 @@ the entire ambient module.
 
 The producer directly imports the local countable-generation predicate and
 `Mathlib.RingTheory.Noetherian.Basic`. This project pins Lean
-`leanprover/lean4:v4.34.0-rc2` and mathlib
-`83abb3e776bdefcbc447a1e44d0debe4010039e5`, alongside exact official
+`leanprover/lean4:v4.36.0-rc1` and mathlib
+`2cabef97b63d3275776b8b060d802de6a6fa1055`, alongside exact official
 General Linear Groups and Stable Range dependencies in `lake-manifest.json`.
 To check a fresh checkout, fetch the matching mathlib cache before building
 the existing default production and ordinary-client targets:

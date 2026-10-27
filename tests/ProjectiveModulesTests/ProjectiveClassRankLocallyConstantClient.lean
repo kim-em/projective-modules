@@ -134,7 +134,8 @@ private theorem rankLocallyConstantRingHom_whole_additive_projection
     (KTheory.K0.rankLocallyConstantRingHom R).toAddMonoidHom =
       KTheory.K0.lift R
         (((LocallyConstant.mapRingHom (Nat.castRingHom ℤ)).comp
-          (rankLocallyConstantRingHom R)).toAddMonoidHom) := rfl
+          (rankLocallyConstantRingHom R)).toAddMonoidHom) :=
+  KTheory.K0.rankLocallyConstantRingHom_toAddMonoidHom R
 
 /-- The original independently lifted rational coordinate modules test both ring laws. -/
 private theorem rankLocallyConstantRingHom_rational_arithmetic :

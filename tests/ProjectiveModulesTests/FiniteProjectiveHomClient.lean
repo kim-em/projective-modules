@@ -9,7 +9,7 @@ public import Mathlib.Algebra.Module.Equiv.Basic
 public import Mathlib.Algebra.Ring.PUnit
 public import Mathlib.Data.ZMod.Basic
 public import Mathlib.LinearAlgebra.Finsupp.VectorSpace
-import ProjectiveModules.Module.PID
+import TauCeti.LinearAlgebra.FreeModule.PID
 import Mathlib.Algebra.EuclideanDomain.Int
 import Mathlib.Algebra.Module.Torsion.Free
 import Mathlib.LinearAlgebra.Dual.Lemmas
@@ -44,7 +44,8 @@ arguments use Mathlib, particularly `Finsupp.basisSingleOne`,
 `LinearMap.ringLmapEquivSelf`, `Module.Finite.linearMap`,
 `Module.dual_projective`, and `Module.dual_finite`. The implication from projectivity
 to freeness over `ℤ` uses the public Projective Modules theorem
-`Module.Projective.free_of_pid`. These examples follow the elementary model ideas
+`Module.Free.of_injective_of_projective_of_isPrincipalIdealRing`.
+These examples follow the elementary model ideas
 of the Projective Modules finite-projective developments. This module was written
 with AI assistance.
 -/
@@ -122,7 +123,9 @@ theorem zmod_five_finite_not_projective :
   refine ⟨Module.Finite.of_finite, ?_⟩
   intro hprojective
   let : Module.Projective ℤ (ZMod 5) := hprojective
-  let : Module.Free ℤ (ZMod 5) := Module.Projective.free_of_pid ℤ (ZMod 5)
+  let : Module.Free ℤ (ZMod 5) :=
+    Module.Free.of_injective_of_projective_of_isPrincipalIdealRing
+      (LinearMap.id : ZMod 5 →ₗ[ℤ] ZMod 5) Function.injective_id
   let : Module.IsTorsionFree ℤ (ZMod 5) := Module.Free.instIsTorsionFree ℤ (ZMod 5)
   have hzero := (Module.isTorsionFree_iff_smul_eq_zero (R := ℤ) (M := ZMod 5)).mp
     (inferInstance : Module.IsTorsionFree ℤ (ZMod 5)) 5 1 zmod_five_annihilator.2.2

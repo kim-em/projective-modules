@@ -5,7 +5,7 @@ Authors: Formal Frontier Agents
 module
 
 public import ProjectiveModules.KTheory.TensorProduct
-public import GroupTheory.MonoidLocalization.GrothendieckGroup.Ring
+public import TauCeti.RingTheory.GrothendieckRing
 
 /-!
 # The tensor-product ring on K₀
@@ -29,10 +29,10 @@ additive group and stored operations. The generic APIs apply directly:
 
 * `Algebra.GrothendieckAddGroup.liftRingHom` extends any ring homomorphism
   `ProjectiveClass R →+* S` to `K0 R →+* S`.
-* `Algebra.GrothendieckAddGroup.liftRingHom_of` evaluates this extension on class
+* `Algebra.GrothendieckAddGroup.liftRingHom_apply_of` evaluates this extension on class
   generators; `liftRingHom_toAddMonoidHom` identifies its whole additive lift.
 * `Algebra.GrothendieckAddGroup.ringHom_ext` gives extensionality on class
-  generators, and `liftRingEquiv` packages extension and restriction as inverse maps.
+  generators, and `liftRingHom` packages extension and restriction as inverse maps.
 
 Here `S` is any ring in an independent universe: neither commutativity nor
 nontriviality is required. These APIs need no separate K₀ lifting construction.
@@ -43,7 +43,7 @@ nontriviality is required. These APIs need no separate K₀ lifting construction
   Chapter II, §2, the tensor-product ring on K₀. The zero-ring case extends
   the book's nonzero-ring convention.
 * This library's finite-projective class, tensor-semiring and K₀ formalizations.
-* Formal Frontier's Group Theory ring structure, generator and universal property
+* Tau Ceti's Grothendieck ring structure, generator and universal property
   for additive Grothendieck groups.
 * Alex J. Best and Yaël Dillies' Mathlib Grothendieck completion and its additive
   universal property, and Mathlib's tensor-product formalization.
@@ -62,23 +62,28 @@ variable (R : Type uR) [CommRing R]
 /-- The ring homomorphism from the tensor semiring of finite projective
 right-module classes to K₀. Its additive map is the completion map. -/
 noncomputable def ofClassRingHom : ProjectiveClass R →+* K0 R :=
-  Algebra.GrothendieckAddGroup.ofRingHom (ProjectiveClass R)
+  Algebra.GrothendieckAddGroup.ofRingHom (S := ProjectiveClass R)
 
 /-- Forgetting multiplication retains the entire additive completion map. -/
 theorem ofClassRingHom_toAddMonoidHom :
-    (ofClassRingHom R).toAddMonoidHom = ofClass R := rfl
+    (ofClassRingHom R).toAddMonoidHom = ofClass R := by
+  apply AddMonoidHom.ext
+  intro a
+  exact Algebra.GrothendieckAddGroup.ofRingHom_apply a
 
 /-- The ring homomorphism evaluates as the additive completion map. -/
 @[simp]
 theorem ofClassRingHom_apply (a : ProjectiveClass R) :
-    ofClassRingHom R a = ofClass R a := rfl
+    ofClassRingHom R a = ofClass R a :=
+  Algebra.GrothendieckAddGroup.ofRingHom_apply a
 
 /-- A finite projective right-module class maps to its K₀ generator,
 independently of the module's carrier universe. -/
 theorem ofClassRingHom_of
     (M : Type uM) [AddCommGroup M] [Module Rᵐᵒᵖ M]
     [Module.Finite Rᵐᵒᵖ M] [Module.Projective Rᵐᵒᵖ M] :
-    ofClassRingHom R (ProjectiveClass.of R M) = of R M := rfl
+    ofClassRingHom R (ProjectiveClass.of R M) = of R M :=
+  ofClassRingHom_apply R _
 
 /-- The ring unit is the K₀ generator of the regular right module. -/
 theorem one_eq_of : (1 : K0 R) = of R Rᵐᵒᵖ := rfl
@@ -96,17 +101,17 @@ theorem of_mul
     (N : Type uN) [AddCommGroup N] [Module Rᵐᵒᵖ N]
     [Module.Finite Rᵐᵒᵖ N] [Module.Projective Rᵐᵒᵖ N] :
     of R M * of R N = of R (M ⊗[Rᵐᵒᵖ] N) := by
-  calc
-    of R M * of R N =
-        ofClassRingHom R (ProjectiveClass.of R M * ProjectiveClass.of R N) :=
-      ((ofClassRingHom R).map_mul _ _).symm
-    _ = of R (M ⊗[Rᵐᵒᵖ] N) := by
-      rw [ProjectiveClass.of_mul, ofClassRingHom_of]
+  change Algebra.GrothendieckAddGroup.of (ProjectiveClass.of R M) *
+    Algebra.GrothendieckAddGroup.of (ProjectiveClass.of R N) = _
+  rw [Algebra.GrothendieckAddGroup.of_mul_of, ProjectiveClass.of_mul]
+  rfl
 
 /-- Natural-number casts are natural multiples of the regular right-module generator. -/
-theorem natCast_eq_nsmul (n : ℕ) : (n : K0 R) = n • of R Rᵐᵒᵖ := rfl
+theorem natCast_eq_nsmul (n : ℕ) : (n : K0 R) = n • of R Rᵐᵒᵖ := by
+  rw [of_self, nsmul_one]
 
 /-- Integer casts are integer multiples of the regular right-module generator. -/
-theorem intCast_eq_zsmul (z : ℤ) : (z : K0 R) = z • of R Rᵐᵒᵖ := rfl
+theorem intCast_eq_zsmul (z : ℤ) : (z : K0 R) = z • of R Rᵐᵒᵖ := by
+  rw [of_self, zsmul_one]
 
 end KTheory.K0

@@ -15,7 +15,7 @@ in `ℕ∞`, including infinite length. It therefore preserves and reflects the
 proposition `IsFiniteLength`. These statements apply to every module, with
 independent scalar and carrier universes and no commutativity assumption.
 
-The submodule order isomorphism `ModuleCat.submoduleOrderIsoOfEquivalence`
+The submodule order isomorphism `CategoryTheory.Equivalence.submoduleOrderIso`
 identifies the submodule lattices. Mathlib expresses length as their Krull
 dimension, and `Module.length_ne_top_iff` characterizes finite length.
 
@@ -45,7 +45,7 @@ theorem length_eq_of_equivalence
     Module.length S (e.functor.obj X) = Module.length R X := by
   apply WithBot.coe_injective
   rw [Module.coe_length, Module.coe_length]
-  exact (Order.krullDim_eq_of_orderIso (submoduleOrderIsoOfEquivalence e X)).symm
+  exact (Order.krullDim_eq_of_orderIso (e.submoduleOrderIso X)).symm
 
 /-- An ordinary equivalence of categories of left modules preserves and reflects
 finite length, as characterized by `Module.length_ne_top_iff`. -/

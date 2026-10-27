@@ -4,7 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
-public import Mathlib.Algebra.Category.ModuleCat.Subobject
+public import TauCeti.Algebra.Category.ModuleCat.Equivalence
 public import Mathlib.CategoryTheory.Category.Preorder
 
 /-!
@@ -24,8 +24,8 @@ The identity and composition laws describe the coherence of this transport.
 The construction uses Mathlib's module-subobject correspondence by Markus Himmel,
 subobject equivalences by Bhavik Mehta and Kim Morrison, and the equivalence/order
 isomorphism API by Stephen Morgan, Kim Morrison, Johannes Hölzl and Reid Barton.
-It follows the submodule-lattice construction in
-`ModuleCat.finite_iff_of_equivalence` by Formal Frontier Agents.
+Tau Ceti supplies `CategoryTheory.Equivalence.submoduleOrderIso`; this file records
+its inverse and coherence laws.
 -/
 
 @[expose] public section
@@ -34,88 +34,80 @@ universe uR uS uT vR vS vT
 
 open CategoryTheory
 
-namespace ModuleCat
+namespace CategoryTheory.Equivalence
+
+open ModuleCat
 
 variable {R : Type uR} {S : Type uS} [Ring R] [Ring S]
 
-/-- The order isomorphism on all submodules induced by an ordinary equivalence of
-categories of left modules, with independent scalar and carrier universes. -/
-noncomputable def submoduleOrderIsoOfEquivalence
-    (e : ModuleCat.{vR} R ≌ ModuleCat.{vS} S) (X : ModuleCat.{vR} R) :
-    Submodule R X ≃o Submodule S (e.functor.obj X) :=
-  (subobjectModule X).symm.trans
-    ((Subobject.lowerEquivalence (MonoOver.congr X e)).toOrderIso.trans
-      (subobjectModule (e.functor.obj X)))
-
-private theorem subobjectModule_mk_range {X Y : ModuleCat.{vR} R}
-    (i : Y ⟶ X) [Mono i] :
-    subobjectModule X (Subobject.mk i) = LinearMap.range i.hom := by
-  change LinearMap.range (Subobject.mk i).arrow.hom = LinearMap.range i.hom
-  rw [← Subobject.underlyingIso_hom_comp_eq_mk i, hom_comp]
-  exact LinearEquiv.range_comp (Subobject.underlyingIso i).toLinearEquiv i.hom
-
-private theorem submoduleOrderIsoOfEquivalence_range
+private theorem submoduleOrderIso_range
     (e : ModuleCat.{vR} R ≌ ModuleCat.{vS} S) {X Y : ModuleCat.{vR} R}
     (i : Y ⟶ X) [Mono i] :
-    submoduleOrderIsoOfEquivalence e X (LinearMap.range i.hom) =
+    submoduleOrderIso e X (LinearMap.range i.hom) =
       LinearMap.range (e.functor.map i).hom := by
-  change subobjectModule (e.functor.obj X)
-    ((Subobject.lowerEquivalence (MonoOver.congr X e)).toOrderIso
-      ((subobjectModule X).symm (LinearMap.range i.hom))) = _
-  rw [← subobjectModule_mk_range i, OrderIso.symm_apply_apply]
-  exact subobjectModule_mk_range (e.functor.map i)
-
-/-- Forward transport of a submodule is the range of its inclusion after applying
- the equivalence's forward functor. -/
-@[simp]
-theorem submoduleOrderIsoOfEquivalence_apply
-    (e : ModuleCat.{vR} R ≌ ModuleCat.{vS} S) (X : ModuleCat.{vR} R)
-    (N : Submodule R X) :
-    submoduleOrderIsoOfEquivalence e X N =
-      LinearMap.range ((e.functor.map (ofHom N.subtype)).hom) := by
-  simpa only [hom_ofHom, Submodule.range_subtype] using
-    submoduleOrderIsoOfEquivalence_range e (ofHom N.subtype)
+  have hi : ofHom i.hom.rangeRestrict ≫ ofHom (LinearMap.range i.hom).subtype = i := by
+    ext x
+    rfl
+  rw [submoduleOrderIso_apply]
+  have : Epi (ofHom i.hom.rangeRestrict) :=
+    (ModuleCat.epi_iff_surjective _).mpr i.hom.surjective_rangeRestrict
+  calc
+    _ = LinearMap.range (e.functor.map (ofHom i.hom.rangeRestrict) ≫
+        e.functor.map (ofHom (LinearMap.range i.hom).subtype)).hom := by
+      rw [ModuleCat.hom_comp, LinearMap.range_comp_of_range_eq_top _
+        (ModuleCat.range_eq_top_of_epi _)]
+    _ = _ := by rw [← e.functor.map_comp, hi]
 
 /-- Inverse transport applies the inverse functor to the inclusion and then uses
  the inverse unit isomorphism to land in the original module. -/
 @[simp]
-theorem submoduleOrderIsoOfEquivalence_symm_apply
+theorem submoduleOrderIso_symm_apply
     (e : ModuleCat.{vR} R ≌ ModuleCat.{vS} S) (X : ModuleCat.{vR} R)
     (P : Submodule S (e.functor.obj X)) :
-    (submoduleOrderIsoOfEquivalence e X).symm P =
+    (submoduleOrderIso e X).symm P =
       LinearMap.range
         ((e.inverse.map (ofHom P.subtype) ≫ (e.unitIso.app X).inv).hom) := by
-  change subobjectModule X
-    (Subobject.mk (e.inverse.map (ofHom P.subtype) ≫ (e.unitIso.app X).inv)) = _
-  exact subobjectModule_mk_range _
+  apply (e.submoduleOrderIso X).injective
+  rw [OrderIso.apply_symm_apply, submoduleOrderIso_range]
+  have h : e.functor.map (e.inverse.map (ofHom P.subtype) ≫ (e.unitIso.app X).inv) =
+      (e.counitIso.app (ModuleCat.of S P)).hom ≫ ofHom P.subtype := by
+    rw [Functor.map_comp]
+    have hu : e.functor.map (e.unitIso.app X).inv =
+        (e.counitIso.app (e.functor.obj X)).hom := by
+      exact (e.counit_app_functor X).symm
+    rw [hu]
+    exact e.counitIso.hom.naturality (ofHom P.subtype)
+  rw [h, ModuleCat.hom_comp, LinearMap.range_comp_of_range_eq_top _
+    (ModuleCat.range_eq_top_of_epi _)]
+  exact (Submodule.range_subtype P).symm
 
 /-- Transport along the identity equivalence is the identity on submodules. -/
 @[simp]
-theorem submoduleOrderIsoOfEquivalence_refl (X : ModuleCat.{vR} R) :
-    submoduleOrderIsoOfEquivalence (CategoryTheory.Equivalence.refl (C := ModuleCat.{vR} R)) X =
+theorem submoduleOrderIso_refl (X : ModuleCat.{vR} R) :
+    submoduleOrderIso (CategoryTheory.Equivalence.refl (C := ModuleCat.{vR} R)) X =
       OrderIso.refl (Submodule R X) := by
   apply OrderIso.ext
   funext N
-  rw [submoduleOrderIsoOfEquivalence_apply]
+  rw [submoduleOrderIso_apply]
   exact Submodule.range_subtype N
 
 /-- Transport along a composite equivalence is the composite of the two
 submodule order isomorphisms, with an independent third ring and carrier universe. -/
-theorem submoduleOrderIsoOfEquivalence_trans
+theorem submoduleOrderIso_trans
     {T : Type uT} [Ring T]
     (e : ModuleCat.{vR} R ≌ ModuleCat.{vS} S)
     (f : ModuleCat.{vS} S ≌ ModuleCat.{vT} T) (X : ModuleCat.{vR} R) :
-    submoduleOrderIsoOfEquivalence (e.trans f) X =
-      (submoduleOrderIsoOfEquivalence e X).trans
-        (submoduleOrderIsoOfEquivalence f (e.functor.obj X)) := by
+    submoduleOrderIso (e.trans f) X =
+      (submoduleOrderIso e X).trans
+        (submoduleOrderIso f (e.functor.obj X)) := by
   apply OrderIso.ext
   funext N
-  change submoduleOrderIsoOfEquivalence (e.trans f) X N =
-    submoduleOrderIsoOfEquivalence f (e.functor.obj X)
-      (submoduleOrderIsoOfEquivalence e X N)
-  rw [submoduleOrderIsoOfEquivalence_apply (e.trans f),
-    submoduleOrderIsoOfEquivalence_apply e]
-  exact (submoduleOrderIsoOfEquivalence_range f
+  change submoduleOrderIso (e.trans f) X N =
+    submoduleOrderIso f (e.functor.obj X)
+      (submoduleOrderIso e X N)
+  rw [submoduleOrderIso_apply (e.trans f),
+    submoduleOrderIso_apply e]
+  exact (submoduleOrderIso_range f
     (e.functor.map (ofHom N.subtype))).symm
 
-end ModuleCat
+end CategoryTheory.Equivalence

@@ -6,7 +6,7 @@ module
 
 public import ProjectiveModules.KTheory.Semisimple
 public import ProjectiveModules.KTheory.ModuleEquivalence
-public import ProjectiveModules.RingTheory.Semisimple
+public import TauCeti.RingTheory.Semisimple.Wedderburn.Presentation
 import ProjectiveModules.Category.ChangeOfRings
 import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 import Mathlib.Algebra.Category.ModuleCat.Ulift
@@ -62,9 +62,9 @@ generator is the first basis vector plus twice the second.
 
 ## Semisimple rings and scope
 
-`IsSemisimpleRing.matrixDivisionDecomposition_simple_basis` assembles the
+`TauCeti.IsSemisimpleRing.wedderburnPresentation_simple_basis` assembles the
 simple-row, endomorphism-ring, row-class, basis and regular-coordinate statements
-for `MatrixDivisionDecomposition.ofIsSemisimpleRing R`. This decomposition is
+for `TauCeti.IsSemisimpleRing.wedderburnPresentation R`. This decomposition is
 chosen from Mathlib's Wedderburn–Artin theorem, with coefficient rings in the
 universe of `R`; it is not an additional hypothesis on a semisimple ring.
 
@@ -563,7 +563,7 @@ namespace IsSemisimpleRing
 variable (R : Type uR) [Ring R] [IsSemisimpleRing R]
 
 /-- The simple right-module classification and integer K₀ basis for the
-decomposition `MatrixDivisionDecomposition.ofIsSemisimpleRing` of a semisimple
+decomposition `TauCeti.IsSemisimpleRing.wedderburnPresentation` of a semisimple
 ring. The outer family may be empty.
 
 The supported right rows are simple and classify simple right modules in any
@@ -579,60 +579,60 @@ module-equivalence constructions. The decomposition uses Mathlib's proved
 Wedderburn–Artin input `IsSemisimpleRing.exists_ringEquiv_pi_matrix_divisionRing`.
 Independent carrier universes and the empty outer family extend the published
 description. -/
-theorem matrixDivisionDecomposition_simple_basis :
-    let p : MatrixDivisionDecomposition.{uR, uR} R :=
-      MatrixDivisionDecomposition.ofIsSemisimpleRing R
+theorem wedderburnPresentation_simple_basis :
+    let p : TauCeti.WedderburnPresentation.{uR, uR} R :=
+      TauCeti.IsSemisimpleRing.wedderburnPresentation R
     (∀ i, IsSimpleModule Rᵐᵒᵖ
-        (KTheory.matrixBlockModuleOfRingEquiv p.coefficient
-          (fun j ↦ Fin (p.blockSize j)) p.ringEquiv i)) ∧
+        (KTheory.matrixBlockModuleOfRingEquiv p.divisionRing
+          (fun j ↦ Fin (p.degree j)) p.equiv i)) ∧
       (∀ M : ModuleCat.{uM} Rᵐᵒᵖ, IsSimpleModule Rᵐᵒᵖ M →
         ∃! i, Nonempty (M ≃ₗ[Rᵐᵒᵖ]
-          KTheory.matrixBlockModuleOfRingEquiv p.coefficient
-            (fun j ↦ Fin (p.blockSize j)) p.ringEquiv i)) ∧
-      (∀ i, Nonempty (p.coefficient i ≃+* Module.End Rᵐᵒᵖ
-        (KTheory.matrixBlockModuleOfRingEquiv p.coefficient
-          (fun j ↦ Fin (p.blockSize j)) p.ringEquiv i))) ∧
-      (∀ i, KTheory.ProjectiveClass.matrixFamilyEquivOfRingEquiv p.coefficient
-        (fun j ↦ Fin (p.blockSize j)) p.ringEquiv
-        (KTheory.ProjectiveClass.of R (KTheory.matrixBlockModuleOfRingEquiv p.coefficient
-          (fun j ↦ Fin (p.blockSize j)) p.ringEquiv i)) = Pi.single i 1) ∧
-      (∀ i, KTheory.K0.matrixFamilyBasisOfRingEquiv p.coefficient
-        (fun j ↦ Fin (p.blockSize j)) p.ringEquiv i =
-        KTheory.K0.of R (KTheory.matrixBlockModuleOfRingEquiv p.coefficient
-          (fun j ↦ Fin (p.blockSize j)) p.ringEquiv i)) ∧
-      (∀ i, KTheory.ProjectiveClass.matrixFamilyEquivOfRingEquiv p.coefficient
-        (fun j ↦ Fin (p.blockSize j)) p.ringEquiv
-        (KTheory.ProjectiveClass.of R R) i = p.blockSize i) ∧
-      (∀ i, KTheory.K0.matrixFamilyEquivOfRingEquiv p.coefficient
-        (fun j ↦ Fin (p.blockSize j)) p.ringEquiv
-        (KTheory.K0.of R R) i = (p.blockSize i : ℤ)) := by
+          KTheory.matrixBlockModuleOfRingEquiv p.divisionRing
+            (fun j ↦ Fin (p.degree j)) p.equiv i)) ∧
+      (∀ i, Nonempty (p.divisionRing i ≃+* Module.End Rᵐᵒᵖ
+        (KTheory.matrixBlockModuleOfRingEquiv p.divisionRing
+          (fun j ↦ Fin (p.degree j)) p.equiv i))) ∧
+      (∀ i, KTheory.ProjectiveClass.matrixFamilyEquivOfRingEquiv p.divisionRing
+        (fun j ↦ Fin (p.degree j)) p.equiv
+        (KTheory.ProjectiveClass.of R (KTheory.matrixBlockModuleOfRingEquiv p.divisionRing
+          (fun j ↦ Fin (p.degree j)) p.equiv i)) = Pi.single i 1) ∧
+      (∀ i, KTheory.K0.matrixFamilyBasisOfRingEquiv p.divisionRing
+        (fun j ↦ Fin (p.degree j)) p.equiv i =
+        KTheory.K0.of R (KTheory.matrixBlockModuleOfRingEquiv p.divisionRing
+          (fun j ↦ Fin (p.degree j)) p.equiv i)) ∧
+      (∀ i, KTheory.ProjectiveClass.matrixFamilyEquivOfRingEquiv p.divisionRing
+        (fun j ↦ Fin (p.degree j)) p.equiv
+        (KTheory.ProjectiveClass.of R R) i = p.degree i) ∧
+      (∀ i, KTheory.K0.matrixFamilyEquivOfRingEquiv p.divisionRing
+        (fun j ↦ Fin (p.degree j)) p.equiv
+        (KTheory.K0.of R R) i = (p.degree i : ℤ)) := by
   classical
-  let p : MatrixDivisionDecomposition.{uR, uR} R :=
-    MatrixDivisionDecomposition.ofIsSemisimpleRing R
+  let p : TauCeti.WedderburnPresentation.{uR, uR} R :=
+    TauCeti.IsSemisimpleRing.wedderburnPresentation R
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro i
-    exact KTheory.matrixBlockModuleOfRingEquiv_simple p.coefficient
-      (fun j ↦ Fin (p.blockSize j)) p.ringEquiv i
+    exact KTheory.matrixBlockModuleOfRingEquiv_simple p.divisionRing
+      (fun j ↦ Fin (p.degree j)) p.equiv i
   · intro M hM
     have : IsSimpleModule Rᵐᵒᵖ M := hM
-    exact KTheory.existsUnique_matrixBlockModuleOfRingEquiv p.coefficient
-      (fun j ↦ Fin (p.blockSize j)) p.ringEquiv M
+    exact KTheory.existsUnique_matrixBlockModuleOfRingEquiv p.divisionRing
+      (fun j ↦ Fin (p.degree j)) p.equiv M
   · intro i
-    exact KTheory.matrixBlockModuleOfRingEquiv_end p.coefficient
-      (fun j ↦ Fin (p.blockSize j)) p.ringEquiv i
+    exact KTheory.matrixBlockModuleOfRingEquiv_end p.divisionRing
+      (fun j ↦ Fin (p.degree j)) p.equiv i
   · intro i
-    exact KTheory.matrixBlockModuleOfRingEquiv_class p.coefficient
-      (fun j ↦ Fin (p.blockSize j)) p.ringEquiv i
+    exact KTheory.matrixBlockModuleOfRingEquiv_class p.divisionRing
+      (fun j ↦ Fin (p.degree j)) p.equiv i
   · intro i
-    exact KTheory.K0.matrixFamilyBasisOfRingEquiv_eq_row p.coefficient
-      (fun j ↦ Fin (p.blockSize j)) p.ringEquiv i
-  · intro i
-    simpa only [Fintype.card_fin] using
-      KTheory.ProjectiveClass.matrixFamilyEquivOfRingEquiv_regular p.coefficient
-        (fun j ↦ Fin (p.blockSize j)) p.ringEquiv i
+    exact KTheory.K0.matrixFamilyBasisOfRingEquiv_eq_row p.divisionRing
+      (fun j ↦ Fin (p.degree j)) p.equiv i
   · intro i
     simpa only [Fintype.card_fin] using
-      KTheory.K0.matrixFamilyEquivOfRingEquiv_regular p.coefficient
-        (fun j ↦ Fin (p.blockSize j)) p.ringEquiv i
+      KTheory.ProjectiveClass.matrixFamilyEquivOfRingEquiv_regular p.divisionRing
+        (fun j ↦ Fin (p.degree j)) p.equiv i
+  · intro i
+    simpa only [Fintype.card_fin] using
+      KTheory.K0.matrixFamilyEquivOfRingEquiv_regular p.divisionRing
+        (fun j ↦ Fin (p.degree j)) p.equiv i
 
 end IsSemisimpleRing

@@ -4,7 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
-import ProjectiveModules.ExteriorPower.BaseChange
+import TauCeti.LinearAlgebra.ExteriorPower.BaseChange
 import ProjectiveModules.ExteriorPower.Invertible
 import ProjectiveModules.ExteriorPower.StalkRank
 import ProjectiveModules.ExteriorPower.DeterminantLine
@@ -44,12 +44,26 @@ private instance planeProjective : Module.Projective ℤ (Fin 2 → ℤ) :=
   Module.Projective.of_basis (Pi.basisFun ℤ (Fin 2))
 
 private theorem integerPlane_baseChange :
-    (⋀[ZMod 2]^2 (ZMod 2 ⊗[ℤ] (Fin 2 → ℤ))).map
-        (ExteriorAlgebra.equivBaseChange
-          (R := ℤ) (S := ZMod 2) (M := Fin 2 → ℤ)).toLinearEquiv.toLinearMap =
-      (⋀[ℤ]^2 (Fin 2 → ℤ)).baseChange (ZMod 2) :=
-  ExteriorAlgebra.equivBaseChange_map_exteriorPower
-    (R := ℤ) (S := ZMod 2) (M := Fin 2 → ℤ) 2
+    Nonempty ((⋀[ZMod 2]^2 (ZMod 2 ⊗[ℤ] (Fin 2 → ℤ))) ≃ₗ[ZMod 2]
+      (ZMod 2 ⊗[ℤ] (⋀[ℤ]^2 (Fin 2 → ℤ)))) :=
+  ⟨TauCeti.exteriorPower.equivBaseChange (ZMod 2) 2⟩
+
+-- The canonical carrier equivalence also preserves the homogeneous inclusion
+-- and sends wedges of pure tensors to their coefficient product times the wedge.
+private theorem integerPlane_baseChange_inclusion
+    (x : ⋀[ZMod 2]^2 (ZMod 2 ⊗[ℤ] (Fin 2 → ℤ))) :
+    (⋀[ℤ]^2 (Fin 2 → ℤ)).subtype.baseChange (ZMod 2)
+        (TauCeti.exteriorPower.equivBaseChange (ZMod 2) 2 x) =
+      TauCeti.exteriorAlgebraEquivBaseChange (ZMod 2)
+        (x : ExteriorAlgebra (ZMod 2) (ZMod 2 ⊗[ℤ] (Fin 2 → ℤ))) :=
+  TauCeti.exteriorPower.subtype_baseChange_equivBaseChange (ZMod 2) 2 x
+
+private theorem integerPlane_baseChange_pure_wedge
+    (a : Fin 2 → ZMod 2) (m : Fin 2 → (Fin 2 → ℤ)) :
+    TauCeti.exteriorPower.equivBaseChange (ZMod 2) 2
+        (exteriorPower.ιMulti (ZMod 2) 2 (fun i ↦ a i ⊗ₜ[ℤ] m i)) =
+      (∏ i, a i) ⊗ₜ[ℤ] exteriorPower.ιMulti ℤ 2 m :=
+  TauCeti.exteriorPower.equivBaseChange_ιMulti_tmul (ZMod 2) a m
 
 private theorem integerPlane_topExterior_invertible : Module.Invertible ℤ (⋀[ℤ]^2 (Fin 2 → ℤ)) := by
   apply exteriorPower.invertible_of_rankAtStalk_eq (R := ℤ) (M := Fin 2 → ℤ) 2

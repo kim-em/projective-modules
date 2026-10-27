@@ -76,9 +76,9 @@ theorem isNoetherianObject_iff_of_equivalence
   simp only [IsNoetherianObject, ObjectProperty.is_iff, isNoetherianObject]
   constructor
   · intro h
-    exact ⟨φ.symm.toOrderEmbedding.dual.wellFounded h.wf⟩
+    exact φ.symm.toOrderEmbedding.dual.wellFounded h
   · intro h
-    exact ⟨φ.toOrderEmbedding.dual.wellFounded h.wf⟩
+    exact φ.toOrderEmbedding.dual.wellFounded h
 
 end CategoryTheory
 
@@ -90,12 +90,12 @@ theorem isNoetherianObject_iff {R : Type uR} [Ring R] (X : ModuleCat.{vR} R) :
     CategoryTheory.IsNoetherianObject X ↔ IsNoetherian R X := by
   let φ : Subobject X ≃o Submodule R X := subobjectModule X
   simp only [CategoryTheory.IsNoetherianObject, ObjectProperty.is_iff,
-    CategoryTheory.isNoetherianObject, _root_.isNoetherian_iff']
+    CategoryTheory.isNoetherianObject, _root_.isNoetherian_iff]
   constructor
   · intro h
-    exact ⟨φ.symm.toOrderEmbedding.dual.wellFounded h.wf⟩
+    exact φ.symm.toOrderEmbedding.dual.wellFounded h
   · intro h
-    exact ⟨φ.toOrderEmbedding.dual.wellFounded h.wf⟩
+    exact φ.toOrderEmbedding.dual.wellFounded h
 
 variable (R : Type uR) (S : Type uS) [Ring R] [Ring S]
 
@@ -124,7 +124,7 @@ theorem isNoetherianRing_of_equivalence
   let Y : ModuleCat.{max uS vS} S := ModuleCat.of S (ULift.{vS} S)
   have : Module.Finite S Y := inferInstance
   have : Module.Finite R (e.inverse.obj Y) :=
-    (finite_iff_of_equivalence S R e.symm Y).mpr inferInstance
+    (e.symm.finite_functor_obj_iff Y).mpr inferInstance
   have hGY : IsNoetherian R (e.inverse.obj Y) := inferInstance
   have hFGY : IsNoetherian S (e.functor.obj (e.inverse.obj Y)) :=
     (isNoetherian_iff_of_equivalence R S e (e.inverse.obj Y)).mp hGY

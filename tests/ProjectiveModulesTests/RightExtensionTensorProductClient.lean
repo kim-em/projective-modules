@@ -1008,10 +1008,10 @@ private theorem swapped_balance_not_regular :
             fun _ : Fin 1 ↦ ((1, 0) : B) := by
       -- Evaluate the original bundled scalar action before computing its coordinate.
       have scalarApply (r : Bᵐᵒᵖ) (m : productModule) :
-          (productModule.smul r).hom m =
+          (productModule.smul r).asHom.hom m =
             @SMul.smul Bᵐᵒᵖ productModule productModule.isModule.toSMul r m := rfl
       calc
-        _ = (productModule.smul (MulOpposite.op ((1, 0) : B))).hom productUnit :=
+        _ = (productModule.smul (MulOpposite.op ((1, 0) : B))).asHom.hom productUnit :=
           (scalarApply _ _).symm
         _ = _ := by
           rw [scalarApply]

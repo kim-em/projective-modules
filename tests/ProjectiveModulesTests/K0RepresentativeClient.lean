@@ -57,4 +57,18 @@ example (R : Type u) [Ring R] :
     (ULift.{v} Rᵐᵒᵖ) (Rᵐᵒᵖ × PUnit.{w + 1})).mp
   simp only [K0.of_ulift, K0.of_prod, K0.of_zero, add_zero]
 
+-- The comparison uses the existing Tau Ceti category over the opposite ring,
+-- and accepts representatives outside the scalar universe.
+example (R : Type u) [Ring R] (M : Type v) [AddCommGroup M] [Module Rᵐᵒᵖ M]
+    [Module.Finite Rᵐᵒᵖ M] [Module.Projective Rᵐᵒᵖ M] :
+    K0.splitK0Equiv R (K0.of R M) =
+      TauCeti.SplitK0.of.{u} ((FiniteProjective.tauCetiEquivalence Rᵐᵒᵖ).functor.obj
+        (FiniteProjective.repr Rᵐᵒᵖ M)) :=
+  K0.splitK0Equiv_of R M
+
+example (R : Type u) [Ring R] :
+    K0.splitK0Equiv R (K0.of R (ULift.{v} Rᵐᵒᵖ)) =
+      K0.splitK0Equiv R (K0.of R Rᵐᵒᵖ) := by
+  rw [K0.of_ulift]
+
 end ProjectiveModulesTests.K0RepresentativeClient

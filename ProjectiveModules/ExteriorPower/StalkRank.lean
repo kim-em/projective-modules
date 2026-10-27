@@ -7,7 +7,7 @@ module
 public import Mathlib.LinearAlgebra.ExteriorPower.Basic
 public import Mathlib.RingTheory.Spectrum.Prime.FreeLocus
 import Mathlib.RingTheory.Flat.Localization
-import ProjectiveModules.ExteriorPower.BaseChange
+import TauCeti.LinearAlgebra.ExteriorPower.BaseChange
 
 /-!
 # Exterior powers above all stalk ranks
@@ -29,7 +29,7 @@ cardinality. No global projectivity or finite presentation is required.
 - Mathlib's `exteriorPower.subsingleton_of_span_eq_top_of_card_lt` and
   `Module.subsingleton_of_localization_maximal` supply finite-span vanishing
   and localization detection. The scalar-extension construction uses
-  `ExteriorAlgebra.equivBaseChange` and its homogeneous-submodule compatibility.
+  `TauCeti.exteriorPower.equivBaseChange`.
 -/
 
 @[expose] public section
@@ -60,15 +60,8 @@ theorem subsingleton_of_rankAtStalk_lt
   let A := Localization.AtPrime p
   have : Module.Flat R A := IsLocalization.flat A p.primeCompl
   have : Module.Free A (A ⊗[R] M) := Module.free_of_flat_of_isLocalRing
-  let e := (ExteriorAlgebra.equivBaseChange (R := R) (S := A) (M := M)).toLinearEquiv
-  -- The image equality first identifies the two homogeneous submodules.
-  let ep : (⋀[A]^k (A ⊗[R] M)) ≃ₗ[A] (⋀[R]^k M).baseChange A :=
-    (Submodule.equivMapOfInjective e.toLinearMap e.injective _).trans
-      (LinearEquiv.ofEq _ _
-        (ExteriorAlgebra.equivBaseChange_map_exteriorPower (R := R) (S := A) (M := M) k))
-  -- Flatness turns the tensor-to-image map into a carrier equivalence.
   let eE : (A ⊗[R] (⋀[R]^k M)) ≃ₗ[A] (⋀[A]^k (A ⊗[R] M)) :=
-    (Submodule.toBaseChange.toLinearEquiv A (⋀[R]^k M)).trans ep.symm
+    (TauCeti.exteriorPower.equivBaseChange A k).symm
   have hr : Module.finrank A (A ⊗[R] M) < k := by
     rw [← (LocalizedModule.equivTensorProduct p.primeCompl M).finrank_eq]
     exact h ⟨p, hp.isPrime⟩

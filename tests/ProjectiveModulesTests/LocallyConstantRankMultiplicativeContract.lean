@@ -79,12 +79,17 @@ private noncomputable def completionTerm (R : Type uR) [CommRing R]
   Algebra.GrothendieckAddGroup.liftRingHom
     ((LocallyConstant.mapRingHom (Nat.castRingHom ℤ)).comp q)
 
-/-- SOURCE-ONLY rfl probe for the WHOLE OLD additive lift, not pointwise equality. -/
+/-- The whole additive projection agrees with the canonical completion lift. -/
 private theorem oldAdditiveProjectionProbe (R : Type uR) [CommRing R]
     (q : KTheory.ProjectiveClass R →+* LocallyConstant (PrimeSpectrum R) ℕ) :
     (completionTerm R q).toAddMonoidHom =
       KTheory.K0.lift R
-        (((LocallyConstant.mapRingHom (Nat.castRingHom ℤ)).comp q).toAddMonoidHom) :=
+        (((LocallyConstant.mapRingHom (Nat.castRingHom ℤ)).comp q).toAddMonoidHom) := by
+  apply KTheory.K0.hom_ext_ofClass R
+  intro a
+  change Algebra.GrothendieckAddGroup.liftRingHom _
+    (Algebra.GrothendieckAddGroup.of a) = _
+  rw [Algebra.GrothendieckAddGroup.liftRingHom_apply_of, KTheory.K0.lift_ofClass]
   rfl
 
 /-- Unproved generator/bundled compatibility contract for hypothetical q and rho. -/

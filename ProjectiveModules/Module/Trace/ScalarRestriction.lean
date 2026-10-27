@@ -4,7 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
-public import ProjectiveModules.Module.ScalarRestriction
+public import TauCeti.Algebra.Module.Projective.Trans
 public import ProjectiveModules.Module.Trace.Basic
 public import Mathlib.RingTheory.Trace.Defs
 
@@ -37,7 +37,7 @@ formalization by Oliver Nash and Antoine Labelle in
 `Mathlib.LinearAlgebra.Contraction` supplies the rank-one trace approach used
 in `ProjectiveModules.Module.Trace.Basic` and the cyclicity approach in
 `ProjectiveModules.Module.Trace.Cyclicity`. Projectivity in a scalar tower is
-provided by `ProjectiveModules.Module.ScalarRestriction` at semiring level.
+provided by `TauCeti.Algebra.Module.Projective.Trans` at semiring level.
 -/
 
 @[expose] public section
