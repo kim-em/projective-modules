@@ -129,3 +129,24 @@ Grothendieck-ring implementation is no longer imported or required.
 
 The [historical API records](history/README.md) retain their original producer
 metadata. They do not describe or certify the migrated API.
+
+## Attribution of replaced source modules
+
+The modules below were removed when their constructions were replaced by imports.
+Their original authorship remains part of this library's provenance. All nine
+modules had `Authors: Formal Frontier Agents` and Apache-2.0 notices. Links point
+to the source before replacement; the contributor comments are transcribed verbatim.
+The retained additive tensor interface also preserves the original Prism and Lens
+contributor comment from the balanced-tensor module.
+
+| Original module | Original contributor attribution |
+| --- | --- |
+| [ProjectiveModules/ExteriorAlgebra/BaseChange.lean](https://github.com/FormalFrontier/projective-modules/blob/52241359db5999182a2ae97e291a9ba1e4194df4/ProjectiveModules/ExteriorAlgebra/BaseChange.lean) | `-- Contributors: Prism` |
+| [ProjectiveModules/ExteriorPower/BaseChange.lean](https://github.com/FormalFrontier/projective-modules/blob/52241359db5999182a2ae97e291a9ba1e4194df4/ProjectiveModules/ExteriorPower/BaseChange.lean) | `-- Contributors: Iris` |
+| [ProjectiveModules/Module/BalancedTensorProduct.lean](https://github.com/FormalFrontier/projective-modules/blob/52241359db5999182a2ae97e291a9ba1e4194df4/ProjectiveModules/Module/BalancedTensorProduct.lean) | `-- Contributors: Prism, Lens` |
+| [ProjectiveModules/Module/Injective.lean](https://github.com/FormalFrontier/projective-modules/blob/52241359db5999182a2ae97e291a9ba1e4194df4/ProjectiveModules/Module/Injective.lean) | `No separate contributor comment; Authors: Formal Frontier Agents` |
+| [ProjectiveModules/Module/PID.lean](https://github.com/FormalFrontier/projective-modules/blob/52241359db5999182a2ae97e291a9ba1e4194df4/ProjectiveModules/Module/PID.lean) | `-- Contributors: Prism` |
+| [ProjectiveModules/Module/RightDual.lean](https://github.com/FormalFrontier/projective-modules/blob/52241359db5999182a2ae97e291a9ba1e4194df4/ProjectiveModules/Module/RightDual.lean) | `No separate contributor comment; Authors: Formal Frontier Agents` |
+| [ProjectiveModules/Module/ScalarRestriction.lean](https://github.com/FormalFrontier/projective-modules/blob/52241359db5999182a2ae97e291a9ba1e4194df4/ProjectiveModules/Module/ScalarRestriction.lean) | `No separate contributor comment; Authors: Formal Frontier Agents` |
+| [ProjectiveModules/Order/CompactlyGenerated.lean](https://github.com/FormalFrontier/projective-modules/blob/52241359db5999182a2ae97e291a9ba1e4194df4/ProjectiveModules/Order/CompactlyGenerated.lean) | `No separate contributor comment; Authors: Formal Frontier Agents` |
+| [ProjectiveModules/RingTheory/Semisimple.lean](https://github.com/FormalFrontier/projective-modules/blob/52241359db5999182a2ae97e291a9ba1e4194df4/ProjectiveModules/RingTheory/Semisimple.lean) | `No separate contributor comment; Authors: Formal Frontier Agents` |

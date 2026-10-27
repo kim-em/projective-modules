@@ -17,7 +17,7 @@ right-extension, exactness, determinant, rank and coherence results remain
 in this library. The [current API guide](API.md) lists their providers.
 
 Production source changes from 143 files and 32,958 lines to 135 files
-and 31,260 lines: **1,698 fewer lines (5.2%)**,
+and 31,263 lines: **1,695 fewer lines (5.1%)**,
 including comments and blanks. Nine obsolete modules are removed, one
 additive tensor interface is added, 42 retained production files are edited,
 and 32 of the 118 test files are updated. Counts exclude dependencies,

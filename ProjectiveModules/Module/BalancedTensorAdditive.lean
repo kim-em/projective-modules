@@ -3,6 +3,7 @@ SPDX-License-Identifier: Apache-2.0
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Formal Frontier Agents
 -/
+-- Contributors: Prism, Lens
 module
 
 public import TauCeti.LinearAlgebra.TensorProduct.Balanced.Actions
